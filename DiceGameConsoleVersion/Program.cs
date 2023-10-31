@@ -17,7 +17,7 @@ namespace DiceGameConsoleVersion
         Finishing = 2,
         Finished = 3
     }
-    
+
     public class PointableDice
     {
         public int Score { get; set; }
@@ -50,13 +50,13 @@ namespace DiceGameConsoleVersion
 
     public class Program
     {
-        private static readonly Dictionary<int,int> SingleDicePoints = new Dictionary<int, int>
+        private static readonly Dictionary<int, int> SingleDicePoints = new Dictionary<int, int>
         {
             { 1, 10 },
             { 5, 5 }
         };
-        
-        List<int> Throw(int diceAmount = 6)
+
+        static List<int> Throw(int diceAmount = 6)
         {
             Random rnd = new();
             var hand = new List<int>();
@@ -66,31 +66,9 @@ namespace DiceGameConsoleVersion
             }
 
             return hand;
-            //return new List<int> { 4, 4, 4, 5, 5, 5, };
         }
 
-        private static int CalculatePointsFromDice(int dieScore, int count)
-        {
-            var diePointValue = dieScore == 1 ? 10 : dieScore;
-            return (int)(count < 3 
-                ? SingleDicePoints[dieScore] * count 
-                : diePointValue * 10 * Math.Pow(2, Math.Abs(3 - count)));
-        }
 
-        private static int CalculatePointsFromDice(IEnumerable<PointableDice> dice)
-        {
-            return dice.Sum(die => CalculatePointsFromDice(die.Score, die.Count));
-        }
-
-        private static List<PointableDice> FindDiceToPoint(IEnumerable<int> hand)
-        {
-            var pointableDice = hand
-                .GroupBy(x => x)
-                .Select(g => new PointableDice(g.Key, g.Count()))
-                .Where(p => p.Count > 2 || p.Score is 1 or 5)
-                .ToList();
-            return pointableDice.Count > 0 ? pointableDice : new List<PointableDice>();
-        }
 
         private static void DisplayTheDiceThrown(List<PointableDice> dice)
         {
@@ -107,22 +85,29 @@ namespace DiceGameConsoleVersion
             }
         }
 
-        private static void MakeNextMove(Player player, int alreadyPointedDice, int playerScore, int moveNumber)
+        private static void MakeNextMove(Player player, int alreadyPointedDice, int playerScore, int moveNumber, bool canStillThrow = true)
         {
+            if (!canStillThrow)
+            {
+                return;
+            }
             if (alreadyPointedDice == 6)
             {
                 PlayerMove(player, 0, playerScore, moveNumber + 1);
             }
-            PlayerMove(player, alreadyPointedDice, playerScore);
+            PlayerMove(player, alreadyPointedDice, playerScore, moveNumber + 1);
         }
 
-        private static void PlayerMove(Player player, int alreadyPointedDice = 0, int playerScore = 0, int moveNumber = 1)
+        public static void PlayerMove(Player player, int alreadyPointedDice = 0, int playerScore = 0, int moveNumber = 1)
         {
+            //start
             Program p = new();
-            var playerThrow = p.Throw(6 - alreadyPointedDice);
-            var diceToPoint = FindDiceToPoint(playerThrow);
-            Console.WriteLine($"{moveNumber} throw: {string.Join(", ", playerThrow)}");
+            PointingSystem pointingSystem = new(SingleDicePoints);
+            var playerThrow = Throw(6 - alreadyPointedDice);
+            var diceToPoint = pointingSystem.FindDiceToPoint(playerThrow);
+            Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentPlayerPhrase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
             Console.WriteLine("-------------");
+            //-50 scenario
             if (!diceToPoint.Any())
             {
                 if (alreadyPointedDice != 0)
@@ -136,99 +121,105 @@ namespace DiceGameConsoleVersion
             }
 
             DisplayTheDiceThrown(diceToPoint);
-
+            //all dice are pointable
             if (diceToPoint.Sum(die => die.Count) == 6)
             {
-                playerScore += CalculatePointsFromDice(diceToPoint);
+                playerScore += pointingSystem.CalculatePointsFromDice(diceToPoint);
                 Console.WriteLine("All dice were pointable. Current score = {0}", playerScore);
-                PlayerMove(player,0, playerScore, moveNumber + 1);
+                PlayerMove(player, 0, playerScore, moveNumber + 1);
             }
 
-            Console.WriteLine("Select the dice to point.");
-            var input = Console.ReadLine();
-            const string multipleValuesPattern = @"\([^)]+\)";
-
-            if (!string.IsNullOrEmpty(input))
+            //selection
+            const string entireInputMatch = @"^\(\d,[1-6]\)(,\(\d,[1-6]\))*$";
+            const string multipleValuesPattern = @"\((?:[1-6],[1-6](?:,\s*)?)+\)"; //this should validate both if the format is correct and if the player chose correct dice
+            var regex = new Regex(entireInputMatch);
+            var tempscore = 0;
+            bool incorrectInput = true;
+            while (incorrectInput)
             {
-                var isMatch = Regex.IsMatch(input, multipleValuesPattern);
-                if (isMatch)
+                Console.WriteLine("Select the dice to point.");
+                var input = Console.ReadLine();
+
+                if (!string.IsNullOrEmpty(input))
                 {
-                    Regex regex = new Regex(multipleValuesPattern);
-                    MatchCollection matches = regex.Matches(input);
-                    foreach (Match match in matches.Cast<Match>())
-                    {
-                        var pointableDice = new PointableDice(match.Value
-                            .ToString()
-                            .Trim('(', ')')
-                            .Split(','));
-                    }
-                    
-                    var dieFromThrow = diceToPoint.FirstOrDefault(x => x.Score == selection.Score && x.Count >= selection.Count);
-                    if (dieFromThrow != null) 
-                    {
-                        if (!SingleDicePoints.ContainsKey(dieFromThrow.Score) && dieFromThrow.Count < 3)
-                        {
-                            Console.WriteLine("Only 1 and 5 can be scored as a single dice. The rest has to be thrown in quantity of 3.");
-                            return;
-                        }
-                        playerScore += CalculatePointsFromDice(selection.Score, selection.Count);
-                        alreadyPointedDice += selection.Count;
+                    if (regex.IsMatch(input))
+                    {  
+                        MatchCollection matches = Regex.Matches(input, multipleValuesPattern);
 
-                        if (player.CurrentPlayerPhrase == GamePhase.Entered)
+                        foreach (Match match in matches.Cast<Match>())
                         {
-                            if (playerScore < 30)
-                            {
-                                Console.WriteLine("Your score is {0}", playerScore);
-                                PlayerMove(player, alreadyPointedDice, playerScore);
-                            }
-                            Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
-                            var response = Console.ReadLine();
-                            if (response != "Y")
-                            {
-                                player.Score += playerScore;
-                                return;
-                            }
-                            MakeNextMove(player, alreadyPointedDice, playerScore, moveNumber);
-                        }
+                            var pointableDice = new PointableDice(match.Value
+                                .ToString()
+                                .Trim('(', ')')
+                                .Split(','));
 
-                        if (playerScore < 100)
-                        {
-                            Console.WriteLine("Your score is {0}", playerScore);
-                            MakeNextMove(player, alreadyPointedDice, playerScore, moveNumber);
-                        }
-                        else
-                        {
-                            if (player.CurrentPlayerPhrase == GamePhase.Finishing)
+                            //dice which player chose
+                            if (diceToPoint.Any(x => x.Score == pointableDice.Score && x.Count >= pointableDice.Count))
                             {
-                                player.CurrentPlayerPhrase = GamePhase.Finished;
-                                return;
+                                if (!SingleDicePoints.ContainsKey(pointableDice.Score) && pointableDice.Count < 3)
+                                {
+                                    Console.WriteLine("Only 1 and 5 can be scored as a single dice. The rest has to be thrown in quantity of 3.");
+                                    break;
+                                }
+                                incorrectInput = false;
+                                tempscore += pointingSystem.CalculatePointsFromDice(pointableDice.Score, pointableDice.Count);
+                                alreadyPointedDice += pointableDice.Count;
                             }
-                            Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
-                            var response = Console.ReadLine();
-                            if (response != "Y")
-                            {
-                                player.Score += playerScore;
-                                return;
-                            }
-                            MakeNextMove(player, alreadyPointedDice, playerScore, moveNumber);
                         }
                     }
-                    else
+                    else //incorrect selection
                     {
                         Console.WriteLine("Incorrect selection. Please select correct dice.");
                     }
                 }
-                else
+                else //no match for regex
                 {
                     Console.WriteLine("Incorrect selection. Please select correct dice.");
                 }
             }
+            playerScore += tempscore;
+            if (player.CurrentPlayerPhrase == GamePhase.Entered)
+            {
+                if (playerScore < 30)
+                {
+                    Console.WriteLine("Your score is {0}", playerScore);
+                    PlayerMove(player, alreadyPointedDice, playerScore);
+                }
+                Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
+                var response = Console.ReadLine();
+                if (response != "Y")
+                {
+                    player.Score += playerScore;
+                    Console.WriteLine($"{player.Name}'s score: {player.Score}");
+                    return;
+                }
+                MakeNextMove(player, alreadyPointedDice, playerScore, moveNumber);
+            }
+
+            if (playerScore < 100)
+            {
+                Console.WriteLine("Your score is {0}", playerScore);
+                MakeNextMove(player, alreadyPointedDice, playerScore, moveNumber);
+            }
             else
             {
-                Console.WriteLine("Incorrect selection. Please select correct dice.");
+                if (player.CurrentPlayerPhrase == GamePhase.Finishing)
+                {
+                    player.CurrentPlayerPhrase = GamePhase.Finished;
+                    return;
+                }
+                Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
+                var response = Console.ReadLine();
+                if (response != "Y")
+                {
+                    player.Score += playerScore;
+                    player.CurrentPlayerPhrase = GamePhase.Entered;
+                    Console.WriteLine($"{player.Name}'s score: {player.Score}");
+                    return;
+                }
+                MakeNextMove(player, alreadyPointedDice, playerScore, moveNumber);
             }
         }
-
         public static void Main()
         {
 

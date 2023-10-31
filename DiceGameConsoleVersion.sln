@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceGameConsoleVersion", "DiceGameConsoleVersion\DiceGameConsoleVersion.csproj", "{E17D995A-3DBF-4956-8D38-807E35B9062D}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiceGameConsoleVersion", "DiceGameConsoleVersion\DiceGameConsoleVersion.csproj", "{E17D995A-3DBF-4956-8D38-807E35B9062D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceGameUnitTests", "DiceGameUnitTests\DiceGameUnitTests.csproj", "{355BC246-74C1-4E32-AEAE-8DF17BCFE566}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +17,15 @@ Global
 		{E17D995A-3DBF-4956-8D38-807E35B9062D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E17D995A-3DBF-4956-8D38-807E35B9062D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E17D995A-3DBF-4956-8D38-807E35B9062D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{355BC246-74C1-4E32-AEAE-8DF17BCFE566}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{355BC246-74C1-4E32-AEAE-8DF17BCFE566}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{355BC246-74C1-4E32-AEAE-8DF17BCFE566}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{355BC246-74C1-4E32-AEAE-8DF17BCFE566}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {71B6C6C5-A6E3-4AB7-88A9-12333E764550}
 	EndGlobalSection
 EndGlobal
