@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DiceGameConsoleVersion.Models;
 
 namespace DiceGameConsoleVersion
 {
-    internal class PointingSystem
+    public class PointingSystem
     {
         private Dictionary<int, int> SingleDicePoints { get; set; }
         public PointingSystem(Dictionary<int, int> singleDicePoints)
