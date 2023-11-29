@@ -4,7 +4,7 @@ namespace DiceGameConsoleVersion
 {
     public class Program
     {
-        private static readonly Dictionary<int, int> SingleDicePoints = new Dictionary<int, int>
+        private static readonly Dictionary<int, int> SingleDicePoints = new()
         {
             { 1, 10 },
             { 5, 5 }
@@ -53,7 +53,7 @@ namespace DiceGameConsoleVersion
                 }
                 var playerThrow = Throw(6 - alreadyPointedDice);
                 var diceToPoint = pointingSystem.FindDiceToPoint(playerThrow);
-                Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentPlayerPhrase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
+                Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentPlayerPhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
                 Console.WriteLine("-------------");
                 //-50 scenario
                 if (!diceToPoint.Any())
@@ -107,7 +107,7 @@ namespace DiceGameConsoleVersion
                 }
                 playerScore += tempscore;
                 //todo => add mechanics of substracting player's score if they surpass one another
-                if (player.CurrentPlayerPhrase == GamePhase.Entered)
+                if (player.CurrentPlayerPhase == GamePhase.Entered)
                 {
                     if (playerScore < 30)
                     {
@@ -130,16 +130,17 @@ namespace DiceGameConsoleVersion
                 }
                 else
                 {
-                    if (player.CurrentPlayerPhrase == GamePhase.Finishing)
+                    if (player.CurrentPlayerPhase == GamePhase.Finishing)
                     {
-                        player.CurrentPlayerPhrase = GamePhase.Finished;
+                        player.CurrentPlayerPhase = GamePhase.Finished;
                     }
                     Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
                     var response = Console.ReadLine();
                     if (response != "Y")
                     {
+                        pointingSystem.UpdateScoreboard(players, player, playerScore)
                         player.Score += playerScore;
-                        player.CurrentPlayerPhrase = GamePhase.Entered;
+                        player.CurrentPlayerPhase = GamePhase.Entered;
                         Console.WriteLine($"{player.Name}'s score: {player.Score}\n");
                         break;
                     }
@@ -150,13 +151,13 @@ namespace DiceGameConsoleVersion
         {
             var players = new List<Player>
             {
-                new() { Name = "Jan", Score = 0, CurrentPlayerPhrase = 0 },
-                new() { Name = "Kamil", Score = 0, CurrentPlayerPhrase = 0 },
-                new() { Name = "Stefan", Score = 0, CurrentPlayerPhrase = 0 },
-                new() { Name = "Tomasz", Score = 0, CurrentPlayerPhrase = 0 },
+                new() { Name = "Jan", Score = 0, CurrentPlayerPhase = 0 },
+                new() { Name = "Kamil", Score = 0, CurrentPlayerPhase = 0 },
+                new() { Name = "Stefan", Score = 0, CurrentPlayerPhase = 0 },
+                new() { Name = "Tomasz", Score = 0, CurrentPlayerPhase = 0 },
             };
             PointingSystem pointingSystem = new(SingleDicePoints);
-            while (!players.Any(x => x.CurrentPlayerPhrase == GamePhase.Finished))
+            while (!players.Any(x => x.CurrentPlayerPhase == GamePhase.Finished))
             {
                 foreach (var player in players)
                 {
