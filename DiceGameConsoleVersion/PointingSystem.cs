@@ -1,6 +1,4 @@
 ﻿using DiceGameConsoleVersion.Models;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using static DiceGameConsoleVersion.Extensions;
 
 namespace DiceGameConsoleVersion
@@ -35,36 +33,65 @@ namespace DiceGameConsoleVersion
             return pointableDice.Count > 0 ? pointableDice : new List<PointableDice>();
         }
 
-        public List<Player> UpdateScoreboard(List<Player> playerList, Player player, int score)
+        public List<Player> UpdateScoreboard(List<Player> playerList, string name, int score)
         {
-            var noChangeHasBeenDone = false;
-            var listOfPlayersLastUpdate = Clone(playerList).OrderBy(x => x.Score).ToList();
-            playerList.First(x => x.Name == player.Name).Score += score;
-            while (!noChangeHasBeenDone)
+            var playerListOld = Clone(playerList).OrderByScore();               
+                
+            playerList.GetPlayerByName(name).Score += score;                    
+            playerList = playerList.OrderByScore();                             
+            
+            var playerIndex = GetPlayerIndex(playerList, name);         
+            var playerScoreDecreased = true;
+            while (playerScoreDecreased)
             {
-                noChangeHasBeenDone = true;
-                playerList = playerList.OrderBy(x => x.Score).ToList();
-                if (playerList.SequenceEqual(listOfPlayersLastUpdate))
-                {
-                    return playerList;
-                }
+                playerList = playerList.OrderByScore();
+                
+                var differences = playerListOld
+                    .Where(player => playerListOld.IndexOf(player) < playerList.IndexOf(player))
+                    .OrderByDescending(player => player.Score)
+                    .ToList();
 
-                for(int i = 0; i < playerList.Count; i++)
+                if (differences.Any())
                 {
-                    if (playerList[i].Name != listOfPlayersLastUpdate[i].Name)
+                    playerListOld = Clone(playerList).OrderByScore();
+                    foreach (var diff in differences)
                     {
-                        var playerMarkedForScoreDecrease = playerList.First(x => x.Name == listOfPlayersLastUpdate[i].Name);
-                        if (playerMarkedForScoreDecrease.CurrentPlayerPhase == GamePhase.NotEntered)
+                        var playerMarkedForPointDecrease = playerList.First(x => x.Name == diff.Name);
+                        if (playerMarkedForPointDecrease.CurrentPlayerPhase == GamePhase.NotEntered)
                         {
                             continue;
                         }
-                        playerMarkedForScoreDecrease.Score -= 100;
-                        listOfPlayersLastUpdate = listOfPlayersLastUpdate.OrderBy(x => x.Score).ToList();
-                        noChangeHasBeenDone = false;
+
+                        var playerWithHigherIndex = playerList.GetPlayerWithHigherIndex(playerMarkedForPointDecrease);
+                        if (playerWithHigherIndex == null)
+                        {
+                            continue;
+                        }
+
+                        if (playerMarkedForPointDecrease.Score == playerWithHigherIndex.Score)
+                        {
+                            continue;
+                        }
+
+                        if (playerWithHigherIndex.CurrentPlayerPhase == GamePhase.NotEntered)
+                        {
+                            continue;
+                        }
+
+                        playerMarkedForPointDecrease.Score -= 100;
                     }
+                }
+                else
+                {
+                    playerScoreDecreased = false;
                 }
             }
             return playerList;
+        }
+
+        private static int GetPlayerIndex(List<Player> players, string playerName)
+        {
+            return players.IndexOf(players.GetPlayerByName(playerName));
         }
     }
 }

@@ -20,6 +20,8 @@ namespace DiceGameConsoleVersion
             }
 
             return hand;
+
+            //return new List<int>() { 3, 3, 3, 1, 1, 5 };
         }
 
         private static void DisplayTheDiceThrown(List<PointableDice> dice)
@@ -37,12 +39,13 @@ namespace DiceGameConsoleVersion
             }
         }
 
-        public static void PlayersTurn(Player player, PointingSystem pointingSystem)
+        public static int PlayersTurn(Player player, PointingSystem pointingSystem)
         {
             bool playerEndendTheirTurn = false;
             int alreadyPointedDice = 0;
             int playerScore = 0;
             int moveNumber = 0;
+            
             while (!playerEndendTheirTurn)
             {
                 //start
@@ -54,18 +57,17 @@ namespace DiceGameConsoleVersion
                 var playerThrow = Throw(6 - alreadyPointedDice);
                 var diceToPoint = pointingSystem.FindDiceToPoint(playerThrow);
                 Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentPlayerPhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
-                Console.WriteLine("-------------");
+                Console.WriteLine("------------------------");
                 //-50 scenario
                 if (!diceToPoint.Any())
                 {
                     if (alreadyPointedDice != 0)
                     {
                         Console.WriteLine("No dice to point was thrown.\n");
-                        return;
+                        return 0;
                     }
-                    playerScore += -50;
                     Console.WriteLine("No dice to point was thrown by player. -50 points.");
-                    return;
+                    return -50;
                 }
 
                 DisplayTheDiceThrown(diceToPoint);
@@ -75,6 +77,7 @@ namespace DiceGameConsoleVersion
                 {
                     playerScore += pointingSystem.CalculatePointsFromDice(diceToPoint);
                     Console.WriteLine("All dice were pointable. Current score = {0}", playerScore);
+                    continue;
                 }
 
                 //selection
@@ -82,8 +85,9 @@ namespace DiceGameConsoleVersion
                 bool incorrectInput = true;
                 while (incorrectInput)
                 {
-                    var values = InputManagement.GetInputAndRetrieveValues();
+                    var values = ConsoleManagement.GetInputAndRetrieveValues();
 
+                    //check if player haven't messed up the selection
                     foreach (var value in values)
                     {
                         var pointableDice = new PointableDice(value
@@ -92,6 +96,9 @@ namespace DiceGameConsoleVersion
                             .Split(','));
 
                         //dice which player chose
+                        
+
+                        
                         if (diceToPoint.Any(x => x.Score == pointableDice.Score && x.Count >= pointableDice.Count))
                         {
                             if (!SingleDicePoints.ContainsKey(pointableDice.Score) && pointableDice.Count < 3)
@@ -118,9 +125,8 @@ namespace DiceGameConsoleVersion
                     var response = Console.ReadLine();
                     if (response != "Y")
                     {
-                        player.Score += playerScore;
                         Console.WriteLine($"{player.Name}'s score: {player.Score}");
-                        break;
+                        return playerScore;
                     }
                 }
 
@@ -133,20 +139,45 @@ namespace DiceGameConsoleVersion
                     if (player.CurrentPlayerPhase == GamePhase.Finishing)
                     {
                         player.CurrentPlayerPhase = GamePhase.Finished;
+                        return playerScore;
                     }
                     Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
                     var response = Console.ReadLine();
                     if (response != "Y")
                     {
-                        pointingSystem.UpdateScoreboard(players, player, playerScore)
-                        player.Score += playerScore;
                         player.CurrentPlayerPhase = GamePhase.Entered;
-                        Console.WriteLine($"{player.Name}'s score: {player.Score}\n");
-                        break;
+                        return playerScore;
+                    }
+                }
+            }
+            return playerScore;
+        }
+
+        public static void StartGame(List<Player> players)
+        {
+            PointingSystem pointingSystem = new(SingleDicePoints);
+            var playerNames = players.Select(p => p.Name);
+            while (!players.Any(x => x.CurrentPlayerPhase == GamePhase.Finished))
+            {
+                foreach (var name in playerNames)
+                {
+                    ConsoleManagement.DisplayLeaderboard(players);
+                    var player = players.First(p => p.Name == name);
+                    var score = PlayersTurn(player, pointingSystem);
+                    if (score != 0)
+                    {
+                        pointingSystem.UpdateScoreboard(players, name, score);
+                    }
+
+                    if (player.CurrentPlayerPhase == GamePhase.Finished)
+                    {
+                        Console.WriteLine($"{name} wins! Congratulations!");
+                        return;
                     }
                 }
             }
         }
+
         public static void Main()
         {
             var players = new List<Player>
@@ -156,14 +187,9 @@ namespace DiceGameConsoleVersion
                 new() { Name = "Stefan", Score = 0, CurrentPlayerPhase = 0 },
                 new() { Name = "Tomasz", Score = 0, CurrentPlayerPhase = 0 },
             };
-            PointingSystem pointingSystem = new(SingleDicePoints);
-            while (!players.Any(x => x.CurrentPlayerPhase == GamePhase.Finished))
-            {
-                foreach (var player in players)
-                {
-                    PlayersTurn(player, pointingSystem);
-                }
-            }
+
+            StartGame(players);
         }
     }
+
 }
