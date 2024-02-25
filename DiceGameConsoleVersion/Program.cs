@@ -20,8 +20,6 @@ namespace DiceGameConsoleVersion
             }
 
             return hand;
-
-            //return new List<int>() { 3, 3, 3, 1, 1, 5 };
         }
 
         private static void DisplayTheDiceThrown(List<PointableDice> dice)
@@ -86,34 +84,30 @@ namespace DiceGameConsoleVersion
                 while (incorrectInput)
                 {
                     var values = ConsoleManagement.GetInputAndRetrieveValues();
+                    var selectedDice = PointableDice.GetAllPointableDiceByStringInput(values);
 
-                    //check if player haven't messed up the selection
-                    foreach (var value in values)
+                    if (!PointableDice.ValidateInput(selectedDice, diceToPoint))
                     {
-                        var pointableDice = new PointableDice(value
-                            .ToString()
-                            .Trim('(', ')')
-                            .Split(','));
+                        Console.WriteLine("Incorrect selection. Please select correct dice.");
+                        continue;
+                    }
 
-                        //dice which player chose
-                        
-
-                        
-                        if (diceToPoint.Any(x => x.Score == pointableDice.Score && x.Count >= pointableDice.Count))
+                    foreach (var die in selectedDice)
+                    {                        
+                        if (diceToPoint.Any(x => x.Score == die.Score && x.Count >= die.Count))
                         {
-                            if (!SingleDicePoints.ContainsKey(pointableDice.Score) && pointableDice.Count < 3)
+                            if (!SingleDicePoints.ContainsKey(die.Score) && die.Count < 3)
                             {
                                 Console.WriteLine("Only 1 and 5 can be scored as a single dice. The rest has to be thrown in quantity of 3.");
                                 break;
                             }
                             incorrectInput = false;
-                            tempscore += pointingSystem.CalculatePointsFromDice(pointableDice.Score, pointableDice.Count);
-                            alreadyPointedDice += pointableDice.Count;
+                            tempscore += pointingSystem.CalculatePointsFromDice(die.Score, die.Count);
+                            alreadyPointedDice += die.Count;
                         }
                     }
                 }
                 playerScore += tempscore;
-                //todo => add mechanics of substracting player's score if they surpass one another
                 if (player.CurrentPlayerPhase == GamePhase.Entered)
                 {
                     if (playerScore < 30)
@@ -121,32 +115,35 @@ namespace DiceGameConsoleVersion
                         Console.WriteLine("Your score is {0}", playerScore);
                         continue;
                     }
-                    Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
-                    var response = Console.ReadLine();
-                    if (response != "Y")
+                    if (alreadyPointedDice < 6)
                     {
-                        Console.WriteLine($"{player.Name}'s score: {player.Score}");
-                        return playerScore;
+                        Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
+                        var response = Console.ReadLine();
+                        if (response != "Y")
+                        {
+                            return playerScore;
+                        }
                     }
-                }
-
-                if (playerScore < 100)
-                {
-                    Console.WriteLine("Your score is {0}", playerScore);
                 }
                 else
                 {
-                    if (player.CurrentPlayerPhase == GamePhase.Finishing)
+                    if (playerScore < 100)
                     {
-                        player.CurrentPlayerPhase = GamePhase.Finished;
-                        return playerScore;
+                        Console.WriteLine("Your score is {0}", playerScore);
                     }
-                    Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
-                    var response = Console.ReadLine();
-                    if (response != "Y")
+                    else
                     {
-                        player.CurrentPlayerPhase = GamePhase.Entered;
-                        return playerScore;
+                        if (player.CurrentPlayerPhase == GamePhase.Finishing)
+                        {
+                            player.CurrentPlayerPhase = GamePhase.Finished;
+                            return playerScore;
+                        }
+                        Console.WriteLine("Your score is {0}. Do you wish to continue?", playerScore);
+                        var response = Console.ReadLine();
+                        if (response != "Y")
+                        {
+                            return playerScore;
+                        }
                     }
                 }
             }
@@ -166,7 +163,7 @@ namespace DiceGameConsoleVersion
                     var score = PlayersTurn(player, pointingSystem);
                     if (score != 0)
                     {
-                        pointingSystem.UpdateScoreboard(players, name, score);
+                        pointingSystem.UpdateScoreboard(players, player, score);
                     }
 
                     if (player.CurrentPlayerPhase == GamePhase.Finished)

@@ -33,22 +33,38 @@ namespace DiceGameConsoleVersion
             return pointableDice.Count > 0 ? pointableDice : new List<PointableDice>();
         }
 
-        public List<Player> UpdateScoreboard(List<Player> playerList, string name, int score)
+        public List<Player> UpdateScoreboard(List<Player> playerList, Player player, int score)
         {
-            var playerListOld = Clone(playerList).OrderByScore();               
-                
-            playerList.GetPlayerByName(name).Score += score;                    
-            playerList = playerList.OrderByScore();                             
+            var initialList = Clone(playerList).OrderByScore();
+            var playerListOld = Clone(playerList).OrderByScore();
+
+            player.Score += score;
+            playerList = playerList.OrderByScore();
             
-            var playerIndex = GetPlayerIndex(playerList, name);         
+            if (player.Score >= 1000)
+            {
+                player.CurrentPlayerPhase = GamePhase.Finished;
+            }
+
+            if (player.CurrentPlayerPhase == GamePhase.NotEntered)
+            {
+                player.CurrentPlayerPhase = GamePhase.Entered;
+            }
+
+            if (player.CurrentPlayerPhase == GamePhase.Entered && player.Score > 900)
+            {
+                player.CurrentPlayerPhase = GamePhase.Finishing;
+            }
+            
+            var playerIndex = GetPlayerIndex(playerList, player.Name);         
             var playerScoreDecreased = true;
             while (playerScoreDecreased)
             {
                 playerList = playerList.OrderByScore();
                 
                 var differences = playerListOld
-                    .Where(player => playerListOld.IndexOf(player) < playerList.IndexOf(player))
-                    .OrderByDescending(player => player.Score)
+                    .Where(p => playerListOld.IndexOf(p) < playerList.IndexOf(p))
+                    .OrderByDescending(p => p.Score)
                     .ToList();
 
                 if (differences.Any())
@@ -85,6 +101,23 @@ namespace DiceGameConsoleVersion
                 {
                     playerScoreDecreased = false;
                 }
+            }
+
+            var playersWithTheSameScore = playerList.Where(p => p.Score == player.Score);
+            if (playersWithTheSameScore.Count() > 1)
+            {
+                var playerIndexAfterScoreUpdate = playerList.IndexOf(player);
+                var playerInitialIndex = initialList.IndexOf(player);
+
+                if (playerIndexAfterScoreUpdate != playerInitialIndex)
+                {
+                    var otherPlayerIndexAfterScoreUpdate = playerList.IndexOf(
+                        playerList.First(p => p.Score == player.Score && p.Name != player.Name));
+
+                    (playerList[otherPlayerIndexAfterScoreUpdate], playerList[playerIndexAfterScoreUpdate]) = 
+                        (playerList[playerIndexAfterScoreUpdate], playerList[otherPlayerIndexAfterScoreUpdate]);
+                }
+
             }
             return playerList;
         }
