@@ -4,12 +4,6 @@ namespace DiceGameConsoleVersion
 {
     public class Program
     {
-        private static readonly Dictionary<int, int> SingleDicePoints = new()
-        {
-            { 1, 10 },
-            { 5, 5 }
-        };
-
         static List<int> Throw(int diceAmount = 6)
         {
             Random rnd = new();
@@ -37,7 +31,7 @@ namespace DiceGameConsoleVersion
             }
         }
 
-        public static int PlayersTurn(Player player, PointingSystem pointingSystem)
+        public static int PlayersTurn(Player player)
         {
             bool playerEndendTheirTurn = false;
             int alreadyPointedDice = 0;
@@ -53,7 +47,7 @@ namespace DiceGameConsoleVersion
                     alreadyPointedDice = 0;
                 }
                 var playerThrow = Throw(6 - alreadyPointedDice);
-                var diceToPoint = pointingSystem.FindDiceToPoint(playerThrow);
+                var diceToPoint = PointingSystem.FindDiceToPoint(playerThrow);
                 Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentPlayerPhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
                 Console.WriteLine("------------------------");
                 //-50 scenario
@@ -73,7 +67,7 @@ namespace DiceGameConsoleVersion
                 //todo => check if dice already pointed and dice thrown are all pointable
                 if (diceToPoint.Sum(die => die.Count) == 6)
                 {
-                    playerScore += pointingSystem.CalculatePointsFromDice(diceToPoint);
+                    playerScore += PointingSystem.CalculatePointsFromDice(diceToPoint);
                     Console.WriteLine("All dice were pointable. Current score = {0}", playerScore);
                     continue;
                 }
@@ -96,13 +90,13 @@ namespace DiceGameConsoleVersion
                     {                        
                         if (diceToPoint.Any(x => x.Score == die.Score && x.Count >= die.Count))
                         {
-                            if (!SingleDicePoints.ContainsKey(die.Score) && die.Count < 3)
+                            if (!PointingSystem.SingleDicePoints.ContainsKey(die.Score) && die.Count < 3)
                             {
                                 Console.WriteLine("Only 1 and 5 can be scored as a single dice. The rest has to be thrown in quantity of 3.");
                                 break;
                             }
                             incorrectInput = false;
-                            tempscore += pointingSystem.CalculatePointsFromDice(die.Score, die.Count);
+                            tempscore += PointingSystem.CalculatePointsFromDice(die.Score, die.Count);
                             alreadyPointedDice += die.Count;
                         }
                     }
@@ -152,7 +146,6 @@ namespace DiceGameConsoleVersion
 
         public static void StartGame(List<Player> players)
         {
-            PointingSystem pointingSystem = new(SingleDicePoints);
             var playerNames = players.Select(p => p.Name);
             while (!players.Any(x => x.CurrentPlayerPhase == GamePhase.Finished))
             {
@@ -160,10 +153,10 @@ namespace DiceGameConsoleVersion
                 {
                     ConsoleManagement.DisplayLeaderboard(players);
                     var player = players.First(p => p.Name == name);
-                    var score = PlayersTurn(player, pointingSystem);
+                    var score = PlayersTurn(player);
                     if (score != 0)
                     {
-                        pointingSystem.UpdateScoreboard(players, player, score);
+                        PointingSystem.UpdateScoreboard(players, player, score);
                     }
 
                     if (player.CurrentPlayerPhase == GamePhase.Finished)

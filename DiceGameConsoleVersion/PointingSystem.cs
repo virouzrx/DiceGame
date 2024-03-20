@@ -5,12 +5,13 @@ namespace DiceGameConsoleVersion
 {
     public class PointingSystem
     {
-        private Dictionary<int, int> SingleDicePoints { get; set; }
-        public PointingSystem(Dictionary<int, int> singleDicePoints)
+        public static readonly Dictionary<int, int> SingleDicePoints = new()
         {
-            SingleDicePoints = singleDicePoints;
-        }
-        public int CalculatePointsFromDice(int dieScore, int count)
+            { 1, 10 },
+            { 5, 5 }
+        };
+
+        public static int CalculatePointsFromDice(int dieScore, int count)
         {
             var diePointValue = dieScore == 1 ? 10 : dieScore;
             return (int)(count < 3
@@ -18,12 +19,12 @@ namespace DiceGameConsoleVersion
                 : diePointValue * 10 * Math.Pow(2, Math.Abs(3 - count)));
         }
 
-        public int CalculatePointsFromDice(IEnumerable<PointableDice> dice)
+        public static int CalculatePointsFromDice(IEnumerable<PointableDice> dice)
         {
             return dice.Sum(die => CalculatePointsFromDice(die.Score, die.Count));
         }
 
-        public List<PointableDice> FindDiceToPoint(IEnumerable<int> hand)
+        public static List<PointableDice> FindDiceToPoint(IEnumerable<int> hand)
         {
             var pointableDice = hand
                 .GroupBy(x => x)
@@ -33,7 +34,7 @@ namespace DiceGameConsoleVersion
             return pointableDice.Count > 0 ? pointableDice : new List<PointableDice>();
         }
 
-        public List<Player> UpdateScoreboard(List<Player> playerList, Player player, int score)
+        public static List<Player> UpdateScoreboard(List<Player> playerList, Player player, int score)
         {
             var initialList = Clone(playerList).OrderByScore();
             var playerListOld = Clone(playerList).OrderByScore();
@@ -56,7 +57,7 @@ namespace DiceGameConsoleVersion
                 player.CurrentPlayerPhase = GamePhase.Finishing;
             }
             
-            var playerIndex = GetPlayerIndex(playerList, player.Name);         
+            var playerIndex = GetPlayerIndex(playerList, player.Name!);         
             var playerScoreDecreased = true;
             while (playerScoreDecreased)
             {

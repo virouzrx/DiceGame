@@ -29,7 +29,7 @@ namespace DiceGameConsoleVersion
             return playerList.First(p => p.Name == name);
         }
         
-        public static Player GetPlayerWithHigherIndex(this List<Player> players, Player player)
+        public static Player? GetPlayerWithHigherIndex(this List<Player> players, Player player)
         {
             int index = players.IndexOf(player);
 
