@@ -44,20 +44,20 @@ namespace DiceGameConsoleVersion
             
             if (player.Score >= 1000)
             {
-                player.CurrentPlayerPhase = GamePhase.Finished;
+                player.CurrentGamePhase = GamePhase.Finished;
             }
 
-            if (player.CurrentPlayerPhase == GamePhase.NotEntered)
+            if (player.CurrentGamePhase == GamePhase.NotEntered)
             {
-                player.CurrentPlayerPhase = GamePhase.Entered;
+                player.CurrentGamePhase = GamePhase.Entered;
             }
 
-            if (player.CurrentPlayerPhase == GamePhase.Entered && player.Score > 900)
+            if (player.CurrentGamePhase == GamePhase.Entered && player.Score > 900)
             {
-                player.CurrentPlayerPhase = GamePhase.Finishing;
+                player.CurrentGamePhase = GamePhase.Finishing;
             }
-            
-            var playerIndex = GetPlayerIndex(playerList, player.Name!);         
+
+            var playerIndex = playerList.IndexOf(player);       
             var playerScoreDecreased = true;
             while (playerScoreDecreased)
             {
@@ -74,7 +74,7 @@ namespace DiceGameConsoleVersion
                     foreach (var diff in differences)
                     {
                         var playerMarkedForPointDecrease = playerList.First(x => x.Name == diff.Name);
-                        if (playerMarkedForPointDecrease.CurrentPlayerPhase == GamePhase.NotEntered)
+                        if (playerMarkedForPointDecrease.CurrentGamePhase == GamePhase.NotEntered)
                         {
                             continue;
                         }
@@ -90,12 +90,12 @@ namespace DiceGameConsoleVersion
                             continue;
                         }
 
-                        if (playerWithHigherIndex.CurrentPlayerPhase == GamePhase.NotEntered)
+                        if (playerWithHigherIndex.CurrentGamePhase == GamePhase.NotEntered)
                         {
                             continue;
                         }
 
-                        playerMarkedForPointDecrease.Score -= 100;
+                        playerMarkedForPointDecrease.Score -= (playerListOld.IndexOf(playerMarkedForPointDecrease) - initialList.IndexOf(playerMarkedForPointDecrease)) * 100;
                     }
                 }
                 else
@@ -107,25 +107,17 @@ namespace DiceGameConsoleVersion
             var playersWithTheSameScore = playerList.Where(p => p.Score == player.Score);
             if (playersWithTheSameScore.Count() > 1)
             {
-                var playerIndexAfterScoreUpdate = playerList.IndexOf(player);
-                var playerInitialIndex = initialList.IndexOf(player);
-
-                if (playerIndexAfterScoreUpdate != playerInitialIndex)
+                var playerThatShouldBeHigher = playersWithTheSameScore.First(p => p.Name != player.Name);
+                var playerThatShouldBeHigherIndex = playerList.IndexOf(playerThatShouldBeHigher);
+                var playerIndexAfterUpdate = playerList.IndexOf(player);
+                
+                if (playerIndexAfterUpdate < playerThatShouldBeHigherIndex)
                 {
-                    var otherPlayerIndexAfterScoreUpdate = playerList.IndexOf(
-                        playerList.First(p => p.Score == player.Score && p.Name != player.Name));
-
-                    (playerList[otherPlayerIndexAfterScoreUpdate], playerList[playerIndexAfterScoreUpdate]) = 
-                        (playerList[playerIndexAfterScoreUpdate], playerList[otherPlayerIndexAfterScoreUpdate]);
+                    (playerList[playerIndexAfterUpdate], playerList[playerThatShouldBeHigherIndex]) =
+                        (playerList[playerThatShouldBeHigherIndex], playerList[playerIndexAfterUpdate]);
                 }
-
             }
-            return playerList;
-        }
-
-        private static int GetPlayerIndex(List<Player> players, string playerName)
-        {
-            return players.IndexOf(players.GetPlayerByName(playerName));
+            return playerList.OrderByScore();
         }
     }
 }

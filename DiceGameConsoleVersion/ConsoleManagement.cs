@@ -38,5 +38,20 @@ namespace DiceGameConsoleVersion
             }
             Console.WriteLine("------------------------");
         }
+
+        public static void DisplayTheDiceThrown(List<PointableDice> dice)
+        {
+            foreach (var die in dice)
+            {
+                if (die.Count < 2)
+                {
+                    Console.WriteLine(die.Score);
+                }
+                else
+                {
+                    Console.WriteLine($"{string.Join(", ", Enumerable.Repeat(die.Score.ToString(), die.Count))}");
+                }
+            }
+        }
     }
 }
