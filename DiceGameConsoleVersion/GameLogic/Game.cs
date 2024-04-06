@@ -1,11 +1,13 @@
-﻿using DiceGameConsoleVersion.Models;
+﻿using DiceGameConsoleVersion.Logic;
+using DiceGameConsoleVersion.Models;
+using DiceGameConsoleVersion.Utilities;
 
-namespace DiceGameConsoleVersion
+namespace DiceGameConsoleVersion.GameLogic
 {
     public class Game
     {
-        public List<Player> Players { get; set; }
-        public Game(List<Player> players)
+        public List<IPlayer> Players { get; set; }
+        public Game(List<IPlayer> players)
         {
             Players = players;
         }
@@ -43,7 +45,7 @@ namespace DiceGameConsoleVersion
             }
         }
 
-        public static int PlayersTurn(Player player)
+        public static int PlayersTurn(IPlayer player)
         {
             bool playerEndendTheirTurn = false;
             int alreadyPointedDice = 0;
@@ -53,7 +55,6 @@ namespace DiceGameConsoleVersion
 
             while (!playerEndendTheirTurn)
             {
-                //start
                 moveNumber++;
                 if (alreadyPointedDice == 6)
                 {
@@ -63,7 +64,6 @@ namespace DiceGameConsoleVersion
                 var diceToPoint = PointingSystem.FindDiceToPoint(playerThrow);
                 Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentGamePhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
                 Console.WriteLine("------------------------");
-                //-50 scenario
                 if (!diceToPoint.Any())
                 {
                     if (alreadyPointedDice != 0)
@@ -76,19 +76,16 @@ namespace DiceGameConsoleVersion
                 }
 
                 ConsoleManagement.DisplayTheDiceThrown(diceToPoint);
-                //all dice are pointable
                 var diceCount = diceToPoint.Sum(die => die.Count);
-                if (diceCount == 6 || (diceCount + alreadyPointedDice == 6 && player.CurrentGamePhase == GamePhase.NotEntered))
+                if (diceCount == 6 || diceCount + alreadyPointedDice == 6 && player.CurrentGamePhase == GamePhase.NotEntered)
                 {
                     playerScore += PointingSystem.CalculatePointsFromDice(diceToPoint);
                     Console.WriteLine("All dice were pointable. Current score = {0}", playerScore);
                     continue;
                 }
 
-                //selection
                 var tempscore = 0;
                 tempscore = player.ChooseDice(diceToPoint, ref tempscore, ref alreadyPointedDice);
-                //DecideNextMove
                 playerScore += tempscore;
                 playerEndendTheirTurn = player.EndTurn(playerScore);
             }

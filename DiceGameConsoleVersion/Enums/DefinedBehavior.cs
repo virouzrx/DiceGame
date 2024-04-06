@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace DiceGameConsoleVersion.Models
 {
-    internal class MoveInfo
+    internal class DefinedBehavior
     {
+
     }
 }

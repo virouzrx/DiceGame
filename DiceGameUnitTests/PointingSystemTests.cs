@@ -1,4 +1,5 @@
-using DiceGameConsoleVersion;
+using DiceGameConsoleVersion.GameLogic;
+using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Models;
 
 namespace DiceGameUnitTests
@@ -55,7 +56,7 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_PlayerEntersTheGame_AfterThrowing100()
         {
-            var players = new List<Player>
+            var players = new List<IPlayer>
             {
                 new() { Name = "Player1", Score = 0, PlayerType = PlayerType.Real },
                 new() { Name = "Player2", Score = 0, PlayerType = PlayerType.Real },
@@ -73,7 +74,7 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player2OvertakesPlayer1()
         {
-            var players = new List<Player>
+            var players = new List<IPlayer>
             {
                 new() { Name = "Player1", Score = 300, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
                 new() { Name = "Player2", Score = 295, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
@@ -92,7 +93,7 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player2DoesntOvertakePlayer1_WhenTheirScoreIsEqual()
         {
-            var players = new List<Player>
+            var players = new List<IPlayer>
             {
                 new() { Name = "Player1", Score = 300, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
                 new() { Name = "Player2", Score = 200, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
@@ -112,7 +113,7 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player2DoesntOvertakePlayer1_WhenEnteringTheGame()
         {
-            var players = new List<Player>
+            var players = new List<IPlayer>
             {
                 new() { Name = "Player1", Score = 420, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
                 new() { Name = "Player2", Score = 105, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
@@ -132,7 +133,7 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_PlayerThrewNothingPointable_GetsOvertakenByRestOfThePlayers()
         {
-            var players = new List<Player>
+            var players = new List<IPlayer>
             {
                 new() { Name = "Player1", Score = 420, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
                 new() { Name = "Player2", Score = 400, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
@@ -150,7 +151,7 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player3Overtakes2Players()
         {
-            var players = new List<Player>
+            var players = new List<IPlayer>
             {
                 new() { Name = "Player1", Score = 420, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },
                 new() { Name = "Player2", Score = 400, CurrentGamePhase = GamePhase.Entered, PlayerType = PlayerType.Real },

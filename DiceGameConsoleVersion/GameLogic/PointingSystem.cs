@@ -1,7 +1,9 @@
-﻿using DiceGameConsoleVersion.Models;
-using static DiceGameConsoleVersion.Extensions;
+﻿using DiceGameConsoleVersion.Logic;
+using DiceGameConsoleVersion.Models;
+using DiceGameConsoleVersion.Utilities;
+using static DiceGameConsoleVersion.Utilities.Extensions;
 
-namespace DiceGameConsoleVersion
+namespace DiceGameConsoleVersion.GameLogic
 {
     public class PointingSystem
     {
@@ -34,14 +36,14 @@ namespace DiceGameConsoleVersion
             return pointableDice.Count > 0 ? pointableDice : new List<PointableDice>();
         }
 
-        public static List<Player> UpdateScoreboard(List<Player> playerList, Player player, int score)
+        public static List<IPlayer> UpdateScoreboard(List<IPlayer> playerList, IPlayer player, int score)
         {
             var initialList = Clone(playerList).OrderByScore();
             var playerListOld = Clone(playerList).OrderByScore();
 
             player.Score += score;
             playerList = playerList.OrderByScore();
-            
+
             if (player.Score >= 1000)
             {
                 player.CurrentGamePhase = GamePhase.Finished;
@@ -57,12 +59,12 @@ namespace DiceGameConsoleVersion
                 player.CurrentGamePhase = GamePhase.Finishing;
             }
 
-            var playerIndex = playerList.IndexOf(player);       
+            var playerIndex = playerList.IndexOf(player);
             var playerScoreDecreased = true;
             while (playerScoreDecreased)
             {
                 playerList = playerList.OrderByScore();
-                
+
                 var differences = playerListOld
                     .Where(p => playerListOld.IndexOf(p) < playerList.IndexOf(p))
                     .OrderByDescending(p => p.Score)
@@ -110,7 +112,7 @@ namespace DiceGameConsoleVersion
                 var playerThatShouldBeHigher = playersWithTheSameScore.First(p => p.Name != player.Name);
                 var playerThatShouldBeHigherIndex = playerList.IndexOf(playerThatShouldBeHigher);
                 var playerIndexAfterUpdate = playerList.IndexOf(player);
-                
+
                 if (playerIndexAfterUpdate < playerThatShouldBeHigherIndex)
                 {
                     (playerList[playerIndexAfterUpdate], playerList[playerThatShouldBeHigherIndex]) =

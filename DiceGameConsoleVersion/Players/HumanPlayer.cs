@@ -1,13 +1,15 @@
-﻿using System.Numerics;
+﻿using DiceGameConsoleVersion.GameLogic;
+using DiceGameConsoleVersion.Models;
+using DiceGameConsoleVersion.Utilities;
 
-namespace DiceGameConsoleVersion.Models
+namespace DiceGameConsoleVersion.Logic
 {
-    public class Player
+    public class HumanPlayer : IPlayer
     {
-        public string? Name { get; set; }
+        public string? Name { get; init; }
         public int Score { get; set; }
         public GamePhase CurrentGamePhase { get; set; }
-        public PlayerType PlayerType { get; set; }
+        public PlayerType PlayerType { get; init; }
         public int MoveNumber { get; set; }
 
         public override bool Equals(object? obj)
@@ -15,7 +17,7 @@ namespace DiceGameConsoleVersion.Models
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
-            Player other = (Player)obj;
+            IPlayer other = (IPlayer)obj;
             return Name == other.Name;
         }
 

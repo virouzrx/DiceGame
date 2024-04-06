@@ -1,7 +1,8 @@
-﻿using DiceGameConsoleVersion.Models;
+﻿using DiceGameConsoleVersion.GameLogic;
+using DiceGameConsoleVersion.Logic;
 using System.Text.RegularExpressions;
 
-namespace DiceGameConsoleVersion
+namespace DiceGameConsoleVersion.Utilities
 {
     public class ConsoleManagement
     {
@@ -29,10 +30,10 @@ namespace DiceGameConsoleVersion
             }
         }
 
-        public static void DisplayLeaderboard(List<Player> players)
+        public static void DisplayLeaderboard(List<IPlayer> players)
         {
             Console.WriteLine("------------------------");
-            foreach (var player in players.OrderByDescending(x => x.Score)) 
+            foreach (var player in players.OrderByDescending(x => x.Score))
             {
                 Console.WriteLine($"{player.Name}: {player.Score}");
             }

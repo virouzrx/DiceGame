@@ -1,4 +1,4 @@
-﻿namespace DiceGameConsoleVersion.Models
+﻿namespace DiceGameConsoleVersion.GameLogic
 {
     public class PointableDice
     {
@@ -13,11 +13,11 @@
 
         public PointableDice(string[] input)
         {
-            Score = Int32.Parse(input[0]);
-            Count = Int32.Parse(input[1]);
+            Score = int.Parse(input[0]);
+            Count = int.Parse(input[1]);
         }
 
-        public static List<PointableDice> GetAllPointableDiceByStringInput(IEnumerable<string> input) 
+        public static List<PointableDice> GetAllPointableDiceByStringInput(IEnumerable<string> input)
         {
             var dice = new List<PointableDice>();
             foreach (var item in input)
@@ -48,7 +48,7 @@
                     return false;
                 }
                 //user selected too many dice
-                if(dice.First(x => x.Score == item.Score).Count < item.Count)
+                if (dice.First(x => x.Score == item.Score).Count < item.Count)
                 {
                     return false;
                 }
@@ -58,7 +58,7 @@
                     return false;
                 }
             }
-            
+
             return true;
         }
     }

@@ -1,4 +1,5 @@
-﻿using DiceGameConsoleVersion.Models;
+﻿using DiceGameConsoleVersion.Logic;
+using DiceGameConsoleVersion.Models;
 
 namespace DiceGameConsoleVersion
 {
@@ -6,12 +7,12 @@ namespace DiceGameConsoleVersion
     {
         public static void Main()
         {
-            var players = new List<Player>
+            var players = new List<IPlayer>
             {
-                new() { Name = "Jan", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
-                new() { Name = "Kamil", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
-                new() { Name = "Stefan", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
-                new() { Name = "Tomasz", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
+                new HumanPlayer { Name = "Jan", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
+                new HumanPlayer { Name = "Kamil", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
+                new HumanPlayer { Name = "Stefan", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
+                new HumanPlayer { Name = "Tomasz", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
             };
 
             var game = new Game(players);

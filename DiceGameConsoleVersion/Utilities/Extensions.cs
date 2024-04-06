@@ -1,12 +1,7 @@
-﻿using DiceGameConsoleVersion.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using DiceGameConsoleVersion.Logic;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace DiceGameConsoleVersion
+namespace DiceGameConsoleVersion.Utilities
 {
     public static class Extensions
     {
@@ -19,17 +14,12 @@ namespace DiceGameConsoleVersion
             return JsonSerializer.Deserialize<T>(jsonString);
         }
 
-        public static List<Player> OrderByScore(this List<Player> playerList)
+        public static List<IPlayer> OrderByScore(this List<IPlayer> playerList)
         {
             return playerList.OrderByDescending(x => x.Score).ToList();
         }
 
-        public static Player GetPlayerByName(this List<Player> playerList, string name)
-        {
-            return playerList.First(p => p.Name == name);
-        }
-        
-        public static Player? GetPlayerWithHigherIndex(this List<Player> players, Player player)
+        public static IPlayer? GetPlayerWithHigherIndex(this List<IPlayer> players, IPlayer player)
         {
             int index = players.IndexOf(player);
 
