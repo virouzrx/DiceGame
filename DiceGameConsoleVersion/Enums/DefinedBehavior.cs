@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace DiceGameConsoleVersion.Models
 {
-    internal class DefinedBehavior
+    public enum DefinedBehavior
     {
-
+        NoRisk,
+        LittleRisk,
+        ModeratelyRisky,
+        Risky,
+        VeryRisky
     }
 }

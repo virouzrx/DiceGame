@@ -1,4 +1,5 @@
-﻿using DiceGameConsoleVersion.Logic;
+﻿using DiceGameConsoleVersion.GameLogic;
+using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Models;
 
 namespace DiceGameConsoleVersion

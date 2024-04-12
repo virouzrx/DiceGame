@@ -1,27 +1,9 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Models;
+﻿using System.Text;
 
-namespace DiceGameConsoleVersion.Logic
+namespace DiceGameUnitTests
 {
-    internal class BotPlayer : IPlayer
+    public class Test
     {
-        public string Name { get; init; }
-        public int Score { get; set; }
-        public GamePhase CurrentGamePhase { get; set; }
-        public PlayerType PlayerType { get; init; }
-        public int MoveNumber { get; set; }
-        public DefinedBehavior Behavior { get; init; }
-
-        public int ChooseDice(List<PointableDice> diceToPoint, ref int tempscore, ref int alreadyPointedDice)
-        {
-            return 0;
-        }
-
-        public bool EndTurn(int roundScore)
-        {
-            throw new NotImplementedException();
-        }
-
         static List<List<int>> GenerateDiceCombinations(int numOfDice)
         {
             List<List<int>> combinations = new();
@@ -71,6 +53,27 @@ namespace DiceGameConsoleVersion.Logic
                 }
             }
             return false;
+        }
+
+        static double CalculateProbabilityOfThrowingSomethingPointable(int numberOfDiceToThrow)
+        {
+            var allCombinations = GenerateDiceCombinations(numberOfDiceToThrow);
+            var pointableCombinations = FindPointableCombinations(allCombinations);
+            var unpointableCombinations = allCombinations.Except(pointableCombinations).ToList();
+            var sb = new StringBuilder();
+            foreach (var item in unpointableCombinations)
+            {
+                sb.AppendLine($"{item[0]}, {item[1]}, {item[2]}, {item[3]}, {item[4]}, {item[5]}");   
+            }
+            var x = sb.ToString();
+            return Math.Round((double)pointableCombinations.Count / allCombinations.Count, 2);
+        }
+
+        [Fact]
+        public void DumbTest()
+        {
+            var probability = CalculateProbabilityOfThrowingSomethingPointable(6);
+            var x = 0;
         }
     }
 }
