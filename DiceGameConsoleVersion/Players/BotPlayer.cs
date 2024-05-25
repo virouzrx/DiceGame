@@ -1,5 +1,6 @@
 ﻿using DiceGameConsoleVersion.GameLogic;
 using DiceGameConsoleVersion.Models;
+using System.Text;
 
 namespace DiceGameConsoleVersion.Logic
 {
@@ -12,8 +13,54 @@ namespace DiceGameConsoleVersion.Logic
         public int MoveNumber { get; set; }
         public DefinedBehavior Behavior { get; init; }
 
-        public int ChooseDice(List<PointableDice> diceToPoint, ref int tempscore, ref int alreadyPointedDice)
+        public int MakeMove(List<PointableDice> diceToPoint, ref int tempscore, ref int alreadyPointedDice, List<List<IPlayer>> history)
         {
+            switch (Behavior)
+            {
+                case DefinedBehavior.NoRisk:
+                    return PointingSystem.CalculatePointsFromDice(diceToPoint);
+                case DefinedBehavior.LittleRisk:
+                    if (CurrentGamePhase == GamePhase.Entered)
+                    {
+                        var lastTurn = history.Last();
+                        var index = lastTurn.IndexOf(this);
+                        if (diceToPoint.Count == 1)
+                        {
+                            var die = diceToPoint.First();
+
+                            if (die.DiceCount == 1)
+                            {
+                                return PointingSystem.CalculatePointsFromDice(diceToPoint);
+                            }
+
+                            if (die.DiceCount > 2 || (diceToPoint.Count == 2 && alreadyPointedDice >= 3))
+                            {
+                                return PointingSystem.CalculatePointsFromDice(diceToPoint);
+                            }
+
+                            return PointingSystem.CalculatePointsFromDice(die.Score, die.DiceCount);
+                        }
+                        //2 - 3 pointable dice thrown
+                        var diceCount = diceToPoint.Sum(x => x.DiceCount);
+                        if (alreadyPointedDice < 2)
+                        {
+                            if (diceToPoint.Any(x => x.DiceCount > 2))
+                            {
+                                return PointingSystem.CalculatePointsFromDice(diceToPoint.Where(x => x.DiceCount > 2));
+                            }
+
+                            if (!diceToPoint.Any(x => x.Score == 1))
+                            {
+                                return PointingSystem.CalculatePointsFromDice(5, 1);
+                            }
+                            return PointingSystem.CalculatePointsFromDice(1, 1);
+                        }
+                        return PointingSystem.CalculatePointsFromDice(diceToPoint);
+                    }
+                    break;
+
+            }
+
             return 0;
         }
 
@@ -45,32 +92,42 @@ namespace DiceGameConsoleVersion.Logic
             }
         }
 
-        static List<List<int>> FindPointableCombinations(List<List<int>> allCombinations)
+        static List<List<int>> FindPointableCombinations(List<List<int>> allCombinations, Func<List<int>, bool> condition)
         {
-            List<List<int>> triplets = new();
+            List<List<int>> pointableCombinations = new();
 
             foreach (var combination in allCombinations)
             {
-                if (HasExactNumberOfAKind(combination))
+                if (HasCombinationSatisfyingConditions(combination, condition))
                 {
-                    triplets.Add(combination);
+                    pointableCombinations.Add(combination);
                 }
             }
 
-            return triplets;
+            return pointableCombinations;
         }
 
-        static bool HasExactNumberOfAKind(List<int> combination)
+        static bool HasCombinationSatisfyingConditions(List<int> combination, Func<List<int>, bool> condition)
         {
-            HashSet<int> uniqueValues = new HashSet<int>(combination);
-            foreach (int value in uniqueValues)
-            {
-                if (combination.FindAll(x => x == value).Count >= 3 || combination.Contains(1) || combination.Contains(5))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return condition(combination);
+        }
+
+        static double CalculateProbabilityOfThrowingSomethingPointable(int numberOfDiceToThrow)
+        {
+            var allCombinations = GenerateDiceCombinations(numberOfDiceToThrow);
+            var pointableCombinations = FindPointableCombinations(allCombinations, x => x.FindAll(val => val == x[0]).Count >= 3 || x.Contains(1) || x.Contains(5));
+            var unpointableCombinations = allCombinations.Except(pointableCombinations).ToList();
+            return Math.Round((double)pointableCombinations.Count / allCombinations.Count, 2);
+        }
+
+        public IEnumerable<PointableDice> ChooseDice(List<PointableDice> diceToPoint, int alreadyPointedDice)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EndTurn(int roundScore, List<List<IPlayer>> history, int alreadyPointedDice)
+        {
+            throw new NotImplementedException();
         }
     }
 }

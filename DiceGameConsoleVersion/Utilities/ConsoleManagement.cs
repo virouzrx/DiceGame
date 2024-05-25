@@ -44,13 +44,13 @@ namespace DiceGameConsoleVersion.Utilities
         {
             foreach (var die in dice)
             {
-                if (die.Count < 2)
+                if (die.DiceCount < 2)
                 {
                     Console.WriteLine(die.Score);
                 }
                 else
                 {
-                    Console.WriteLine($"{string.Join(", ", Enumerable.Repeat(die.Score.ToString(), die.Count))}");
+                    Console.WriteLine($"{string.Join(", ", Enumerable.Repeat(die.Score.ToString(), die.DiceCount))}");
                 }
             }
         }

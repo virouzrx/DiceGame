@@ -11,7 +11,6 @@ namespace DiceGameConsoleVersion.Models
         NoRisk,
         LittleRisk,
         ModeratelyRisky,
-        Risky,
-        VeryRisky
+        Risky
     }
 }

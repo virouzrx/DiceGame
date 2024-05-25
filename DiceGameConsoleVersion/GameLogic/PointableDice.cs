@@ -3,18 +3,18 @@
     public class PointableDice
     {
         public int Score { get; set; }
-        public int Count { get; set; }
+        public int DiceCount { get; set; }
 
         public PointableDice(int score, int count)
         {
             Score = score;
-            Count = count;
+            DiceCount = count;
         }
 
         public PointableDice(string[] input)
         {
             Score = int.Parse(input[0]);
-            Count = int.Parse(input[1]);
+            DiceCount = int.Parse(input[1]);
         }
 
         public static List<PointableDice> GetAllPointableDiceByStringInput(IEnumerable<string> input)
@@ -48,12 +48,12 @@
                     return false;
                 }
                 //user selected too many dice
-                if (dice.First(x => x.Score == item.Score).Count < item.Count)
+                if (dice.First(x => x.Score == item.Score).DiceCount < item.DiceCount)
                 {
                     return false;
                 }
                 //user selected one die more than once 
-                if (item.Count < 1)
+                if (item.DiceCount < 1)
                 {
                     return false;
                 }

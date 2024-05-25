@@ -23,7 +23,7 @@ namespace DiceGameConsoleVersion.GameLogic
 
         public static int CalculatePointsFromDice(IEnumerable<PointableDice> dice)
         {
-            return dice.Sum(die => CalculatePointsFromDice(die.Score, die.Count));
+            return dice.Sum(die => CalculatePointsFromDice(die.Score, die.DiceCount));
         }
 
         public static List<PointableDice> FindDiceToPoint(IEnumerable<int> hand)
@@ -31,15 +31,15 @@ namespace DiceGameConsoleVersion.GameLogic
             var pointableDice = hand
                 .GroupBy(x => x)
                 .Select(g => new PointableDice(g.Key, g.Count()))
-                .Where(p => p.Count > 2 || p.Score is 1 or 5)
+                .Where(p => p.DiceCount > 2 || p.Score is 1 or 5)
                 .ToList();
             return pointableDice.Count > 0 ? pointableDice : new List<PointableDice>();
         }
 
         public static List<IPlayer> UpdateScoreboard(List<IPlayer> playerList, IPlayer player, int score)
         {
-            var initialList = Clone(playerList).OrderByScore();
-            var playerListOld = Clone(playerList).OrderByScore();
+            var initialList = playerList.ToList().OrderByScore();
+            var playerListOld = playerList.ToList().OrderByScore();
 
             player.Score += score;
             playerList = playerList.OrderByScore();
@@ -59,6 +59,11 @@ namespace DiceGameConsoleVersion.GameLogic
                 player.CurrentGamePhase = GamePhase.Finishing;
             }
 
+            if (player.CurrentGamePhase == GamePhase.Finishing && player.Score < 900)
+            {
+                player.CurrentGamePhase = GamePhase.Entered;
+            }
+
             var playerIndex = playerList.IndexOf(player);
             var playerScoreDecreased = true;
             while (playerScoreDecreased)
@@ -72,7 +77,7 @@ namespace DiceGameConsoleVersion.GameLogic
 
                 if (differences.Any())
                 {
-                    playerListOld = Clone(playerList).OrderByScore();
+                    playerListOld = playerList.ToList().OrderByScore();
                     foreach (var diff in differences)
                     {
                         var playerMarkedForPointDecrease = playerList.First(x => x.Name == diff.Name);

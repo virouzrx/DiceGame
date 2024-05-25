@@ -1,4 +1,7 @@
 ﻿using DiceGameConsoleVersion.Logic;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace DiceGameConsoleVersion.Utilities
@@ -29,6 +32,13 @@ namespace DiceGameConsoleVersion.Utilities
             }
 
             return null;
+        }
+
+        public static IEnumerable<int> Throw(this Random random, int diceAmount)
+        {
+            return Enumerable.Range(0, diceAmount)
+                         .Select(_ => random.Next(1, 7))
+                         .ToList();
         }
     }
 }

@@ -12,6 +12,12 @@ namespace DiceGameConsoleVersion.Logic
         public PlayerType PlayerType { get; init; }
         public int MoveNumber { get; set; }
 
+        public HumanPlayer(string name, PlayerType playerType)
+        {
+            Name = name;
+            PlayerType = playerType;
+        }
+
         public override bool Equals(object? obj)
         {
             if (obj == null || GetType() != obj.GetType())
@@ -26,13 +32,14 @@ namespace DiceGameConsoleVersion.Logic
             return HashCode.Combine(Name, Score, CurrentGamePhase);
         }
 
-        public int ChooseDice(List<PointableDice> diceToPoint, ref int tempscore, ref int alreadyPointedDice)
+        public IEnumerable<PointableDice> ChooseDice(List<PointableDice> diceToPoint, int alreadyPointedDice)
         {
             var incorrectInput = true;
+            var selectedDice = new List<PointableDice>();
             while (incorrectInput)
             {
                 var values = ConsoleManagement.GetInputAndRetrieveValues();
-                var selectedDice = PointableDice.GetAllPointableDiceByStringInput(values);
+                selectedDice = PointableDice.GetAllPointableDiceByStringInput(values);
 
                 if (!PointableDice.ValidateInput(selectedDice, diceToPoint))
                 {
@@ -42,24 +49,23 @@ namespace DiceGameConsoleVersion.Logic
 
                 foreach (var die in selectedDice)
                 {
-                    if (diceToPoint.Any(x => x.Score == die.Score && x.Count >= die.Count))
+                    if (diceToPoint.Any(x => x.Score == die.Score && x.DiceCount >= die.DiceCount))
                     {
-                        if (!PointingSystem.SingleDicePoints.ContainsKey(die.Score) && die.Count < 3)
+                        if (!PointingSystem.SingleDicePoints.ContainsKey(die.Score) && die.DiceCount < 3)
                         {
                             Console.WriteLine("Only 1 and 5 can be scored as a single dice. The rest has to be thrown in quantity of 3.");
+                            incorrectInput = true;
                             break;
                         }
                         incorrectInput = false;
-                        tempscore += PointingSystem.CalculatePointsFromDice(die.Score, die.Count);
-                        alreadyPointedDice += die.Count;
                     }
                 }
             }
 
-            return tempscore;
+            return selectedDice;
         }
 
-        public bool EndTurn(int roundScore)
+        public bool EndTurn(int roundScore, List<List<IPlayer>> history, int alreadyPointedDice)
         {
             if (CurrentGamePhase == GamePhase.Entered)
             {
@@ -99,6 +105,11 @@ namespace DiceGameConsoleVersion.Logic
                     return false;
                 }
             }
+        }
+
+        public int MakeMove(List<PointableDice> diceToPoint, ref int tempscore, ref int alreadyPointedDice, List<List<IPlayer>> history)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -10,9 +10,7 @@ namespace DiceGameConsoleVersion.Logic
         public GamePhase CurrentGamePhase { get; set; }
         public PlayerType PlayerType { get; init; }
         public int MoveNumber { get; set; }
-
-        public int ChooseDice(List<PointableDice> diceToPoint, ref int tempscore, ref int alreadyPointedDice);
-
-        public bool EndTurn(int roundScore);
+        public IEnumerable<PointableDice> ChooseDice(List<PointableDice> diceToPoint, int alreadyPointedDice);
+        public bool EndTurn(int roundScore, List<List<IPlayer>> history, int alreadyPointedDice);
     }
 }

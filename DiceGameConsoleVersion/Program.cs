@@ -1,6 +1,7 @@
 ﻿using DiceGameConsoleVersion.GameLogic;
 using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Models;
+using DiceGameConsoleVersion.Players;
 
 namespace DiceGameConsoleVersion
 {
@@ -10,10 +11,10 @@ namespace DiceGameConsoleVersion
         {
             var players = new List<IPlayer>
             {
-                new HumanPlayer { Name = "Jan", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
-                new HumanPlayer { Name = "Kamil", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
-                new HumanPlayer { Name = "Stefan", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
-                new HumanPlayer { Name = "Tomasz", Score = 0, CurrentGamePhase = 0, PlayerType = PlayerType.Real },
+                new HumanPlayer("Jan", PlayerType.Real),
+                new HumanPlayer("Kamil", PlayerType.Real),
+                new HumanPlayer("Stefan", PlayerType.Real),
+                new LittleRiskBotPlayer { Name = "Bot", PlayerType = PlayerType.Bot }
             };
 
             var game = new Game(players);

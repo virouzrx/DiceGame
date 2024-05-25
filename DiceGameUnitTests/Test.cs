@@ -61,11 +61,6 @@ namespace DiceGameUnitTests
             var pointableCombinations = FindPointableCombinations(allCombinations);
             var unpointableCombinations = allCombinations.Except(pointableCombinations).ToList();
             var sb = new StringBuilder();
-            foreach (var item in unpointableCombinations)
-            {
-                sb.AppendLine($"{item[0]}, {item[1]}, {item[2]}, {item[3]}, {item[4]}, {item[5]}");   
-            }
-            var x = sb.ToString();
             return Math.Round((double)pointableCombinations.Count / allCombinations.Count, 2);
         }
 
@@ -73,6 +68,11 @@ namespace DiceGameUnitTests
         public void DumbTest()
         {
             var probability = CalculateProbabilityOfThrowingSomethingPointable(6);
+            var probability1 = CalculateProbabilityOfThrowingSomethingPointable(5);
+            var probability2 = CalculateProbabilityOfThrowingSomethingPointable(4);
+            var probability3 = CalculateProbabilityOfThrowingSomethingPointable(3);
+            var probability4 = CalculateProbabilityOfThrowingSomethingPointable(2);
+            var probability5 = CalculateProbabilityOfThrowingSomethingPointable(1);
             var x = 0;
         }
     }
