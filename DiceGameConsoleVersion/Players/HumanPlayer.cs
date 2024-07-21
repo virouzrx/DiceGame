@@ -9,13 +9,11 @@ namespace DiceGameConsoleVersion.Logic
         public string? Name { get; init; }
         public int Score { get; set; }
         public GamePhase CurrentGamePhase { get; set; }
-        public PlayerType PlayerType { get; init; }
         public int MoveNumber { get; set; }
 
-        public HumanPlayer(string name, PlayerType playerType)
+        public HumanPlayer(string name)
         {
             Name = name;
-            PlayerType = playerType;
         }
 
         public override bool Equals(object? obj)
@@ -32,7 +30,7 @@ namespace DiceGameConsoleVersion.Logic
             return HashCode.Combine(Name, Score, CurrentGamePhase);
         }
 
-        public IEnumerable<PointableDice> ChooseDice(List<PointableDice> diceToPoint, int alreadyPointedDice)
+        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory gameHistory, int alreadyPointedDice)
         {
             var incorrectInput = true;
             var selectedDice = new List<PointableDice>();
@@ -65,7 +63,7 @@ namespace DiceGameConsoleVersion.Logic
             return selectedDice;
         }
 
-        public bool EndTurn(int roundScore, List<List<IPlayer>> history, int alreadyPointedDice)
+        public bool EndTurn(int roundScore, GameHistory history, int alreadyPointedDice)
         {
             if (CurrentGamePhase == GamePhase.Entered)
             {
@@ -105,11 +103,6 @@ namespace DiceGameConsoleVersion.Logic
                     return false;
                 }
             }
-        }
-
-        public int MakeMove(List<PointableDice> diceToPoint, ref int tempscore, ref int alreadyPointedDice, List<List<IPlayer>> history)
-        {
-            throw new NotImplementedException();
         }
     }
 }

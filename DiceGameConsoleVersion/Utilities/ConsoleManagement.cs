@@ -40,7 +40,7 @@ namespace DiceGameConsoleVersion.Utilities
             Console.WriteLine("------------------------");
         }
 
-        public static void DisplayTheDiceThrown(List<PointableDice> dice)
+        public static void DisplayTheDiceThrown(IEnumerable<PointableDice> dice)
         {
             foreach (var die in dice)
             {

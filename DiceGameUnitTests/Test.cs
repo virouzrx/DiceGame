@@ -59,8 +59,6 @@ namespace DiceGameUnitTests
         {
             var allCombinations = GenerateDiceCombinations(numberOfDiceToThrow);
             var pointableCombinations = FindPointableCombinations(allCombinations);
-            var unpointableCombinations = allCombinations.Except(pointableCombinations).ToList();
-            var sb = new StringBuilder();
             return Math.Round((double)pointableCombinations.Count / allCombinations.Count, 2);
         }
 

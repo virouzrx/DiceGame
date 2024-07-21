@@ -1,4 +1,7 @@
-﻿namespace DiceGameConsoleVersion.GameLogic
+﻿using DiceGameConsoleVersion.Logic;
+using System.Xml.Linq;
+
+namespace DiceGameConsoleVersion.GameLogic
 {
     public class PointableDice
     {
@@ -15,6 +18,20 @@
         {
             Score = int.Parse(input[0]);
             DiceCount = int.Parse(input[1]);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            PointableDice other = (PointableDice)obj;
+            return Score == other.Score && DiceCount == other.DiceCount;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Score, DiceCount);
         }
 
         public static List<PointableDice> GetAllPointableDiceByStringInput(IEnumerable<string> input)

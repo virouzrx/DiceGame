@@ -1,19 +1,18 @@
 ﻿using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Models;
 using DiceGameConsoleVersion.Utilities;
-using System;
 
 namespace DiceGameConsoleVersion.GameLogic
 {
     public class Game
     {
-        public List<List<IPlayer>> History { get; set; }
+        public GameHistory GameHistory { get; set; }
         public List<IPlayer> Players { get; set; }
         private readonly Random _random;
         public Game(List<IPlayer> players)
         {
             Players = players;
-            History = new List<List<IPlayer>>();
+            GameHistory = new GameHistory();
             _random = new Random();
         }
 
@@ -21,6 +20,7 @@ namespace DiceGameConsoleVersion.GameLogic
         {
             while (!Players.Any(x => x.CurrentGamePhase == GamePhase.Finished))
             {
+                GameHistory.History.Add(Players);
                 foreach (var player in Players)
                 {
                     ConsoleManagement.DisplayLeaderboard(Players);
@@ -35,11 +35,7 @@ namespace DiceGameConsoleVersion.GameLogic
                         Console.WriteLine($"{player.Name} wins! Congratulations!");
                         return;
                     }
-
-                    if (Players.Select(x => x.MoveNumber).Distinct().Count() == 1)
-                    {
-                        History.Add(Players);
-                    }
+                    GameHistory.UpdatePlayer(player);
                 }
             }
         }
@@ -85,16 +81,16 @@ namespace DiceGameConsoleVersion.GameLogic
                 {
                     playerScore += PointingSystem.CalculatePointsFromDice(diceToPoint);
                     Console.WriteLine("All dice were pointable. Current score = {0}", playerScore);
-                    playerEndendTheirTurn = player.EndTurn(playerScore, History, alreadyPointedDice);
+                    playerEndendTheirTurn = player.EndTurn(playerScore, GameHistory, alreadyPointedDice);
                     alreadyPointedDice = 6;
                 }
                 else
                 {
-                    var diceChose = player.ChooseDice(diceToPoint, alreadyPointedDice);
+                    var diceChose = player.ChooseDice(diceToPoint, GameHistory, alreadyPointedDice);
                     alreadyPointedDice += diceChose.Sum(x => x.DiceCount);
                     var tempscore = PointingSystem.CalculatePointsFromDice(diceChose);
                     playerScore += tempscore;
-                    playerEndendTheirTurn = player.EndTurn(playerScore, History, alreadyPointedDice);
+                    playerEndendTheirTurn = player.EndTurn(playerScore, GameHistory, alreadyPointedDice);
                 }
             }
             return playerScore;

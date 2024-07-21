@@ -1,6 +1,6 @@
-﻿using DiceGameConsoleVersion.GameLogic;
+﻿using DiceGameConsoleVersion.Enums;
+using DiceGameConsoleVersion.GameLogic;
 using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
 using DiceGameConsoleVersion.Players;
 
 namespace DiceGameConsoleVersion
@@ -9,12 +9,13 @@ namespace DiceGameConsoleVersion
     {
         public static void Main()
         {
+            var playerFactory = new PlayerFactory();
             var players = new List<IPlayer>
             {
-                new HumanPlayer("Jan", PlayerType.Real),
-                new HumanPlayer("Kamil", PlayerType.Real),
-                new HumanPlayer("Stefan", PlayerType.Real),
-                new LittleRiskBotPlayer { Name = "Bot", PlayerType = PlayerType.Bot }
+                PlayerFactory.CreatePlayer(PlayerType.Human, "Janek"),
+                PlayerFactory.CreatePlayer(PlayerType.Human, "Bartek"),
+                PlayerFactory.CreatePlayer(PlayerType.Human, "Czesiek"),
+                PlayerFactory.CreatePlayer(PlayerType.Bot, "Czesiek", BotType.ModerateRisk),
             };
 
             var game = new Game(players);

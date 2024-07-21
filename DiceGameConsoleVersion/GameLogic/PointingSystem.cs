@@ -26,7 +26,7 @@ namespace DiceGameConsoleVersion.GameLogic
             return dice.Sum(die => CalculatePointsFromDice(die.Score, die.DiceCount));
         }
 
-        public static List<PointableDice> FindDiceToPoint(IEnumerable<int> hand)
+        public static IEnumerable<PointableDice> FindDiceToPoint(IEnumerable<int> hand)
         {
             var pointableDice = hand
                 .GroupBy(x => x)

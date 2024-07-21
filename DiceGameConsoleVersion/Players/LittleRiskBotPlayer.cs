@@ -5,17 +5,21 @@ using System;
 
 namespace DiceGameConsoleVersion.Players
 {
-    internal class LittleRiskBotPlayer : IPlayer
+    public class LittleRiskBotPlayer : IPlayer
     {
-        public string Name { get; init; }
+        public string? Name { get; init; }
         public int Score { get; set; }
         public GamePhase CurrentGamePhase { get; set; }
-        public PlayerType PlayerType { get; init; }
         public int MoveNumber { get; set; }
 
-        public IEnumerable<PointableDice> ChooseDice(List<PointableDice> diceToPoint, int alreadyPointedDice)
+        public LittleRiskBotPlayer(string name)
         {
-            if (diceToPoint.Count == 1)
+            Name = name;
+        }
+
+        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory gameHistory, int alreadyPointedDice)
+        {
+            if (diceToPoint.Count() == 1)
             {
                 var die = diceToPoint.First();
 
@@ -24,7 +28,7 @@ namespace DiceGameConsoleVersion.Players
                     return diceToPoint;
                 }
 
-                if (die.DiceCount > 2 || (diceToPoint.Count == 2 && alreadyPointedDice >= 3))
+                if (die.DiceCount > 2 || (diceToPoint.Count() == 2 && alreadyPointedDice >= 3))
                 {
                     return diceToPoint;
                 }
@@ -55,7 +59,7 @@ namespace DiceGameConsoleVersion.Players
             return diceToPoint;
         }
 
-        public bool EndTurn(int roundScore, List<List<IPlayer>> history, int alreadyPointedDice)
+        public bool EndTurn(int roundScore, GameHistory gameHistory, int alreadyPointedDice)
         {
             if (CurrentGamePhase == GamePhase.Entered)
             {
@@ -65,19 +69,19 @@ namespace DiceGameConsoleVersion.Players
                     return false;
                 }
 
-                if (!PlayerScoredInLastTwoRounds(history, 3, Name)) 
+                if (!gameHistory.PlayerScoredInLastRounds(Name!, 3)) 
                 {
                     return true;
                 }
 
-                var scoreBoard = history.Last();
+                var scoreBoard = gameHistory.GetLastHistoryItem();
                 var playerIndex = scoreBoard.IndexOf(scoreBoard.First(x => x.Name == Name));
                 if (playerIndex == scoreBoard.Count - 1)
                 {
                     return true;
                 }
 
-                return ShouldRisk(history.Last());
+                return ShouldRisk(gameHistory.GetLastHistoryItem());
             }
             else
             {
@@ -108,22 +112,12 @@ namespace DiceGameConsoleVersion.Players
                     return true;
                 }
             }
-            if (players[index - 1].Score - Score <= 45 && Score - players[index + 1].Score > 75) 
+            if (index != players.Count - 1 && players[index - 1].Score - Score <= 45 && Score - players[index + 1].Score > 75) 
             {
                 return true;
             }
 
             return false;
-        }
-
-        private static bool PlayerScoredInLastTwoRounds(List<List<IPlayer>> history, int numberOfRoundsToCheck, string playerName)
-        {
-           return history.TakeLast(numberOfRoundsToCheck)
-            .Select(x => x
-                .Where(y => y.Name == playerName)
-                .Select(y => y.Score))
-            .Distinct()
-            .Count() > 1;
         }
     }
 }

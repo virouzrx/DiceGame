@@ -58,10 +58,10 @@ namespace DiceGameUnitTests
         {
             var players = new List<IPlayer>
             {
-                new HumanPlayer("Player1", PlayerType.Real),
-                new HumanPlayer("Player2", PlayerType.Real),
-                new HumanPlayer("Player3", PlayerType.Real),
-                new HumanPlayer("Player4", PlayerType.Real)
+                new HumanPlayer("Player1"),
+                new HumanPlayer ("Player2"),
+                new HumanPlayer ("Player3"),
+                new HumanPlayer ("Player4")
             };
 
             var player1 = players.First();
@@ -74,10 +74,10 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player2OvertakesPlayer1()
         {
-            var player1 = new HumanPlayer("Player1", PlayerType.Real);
-            var player2 = new HumanPlayer("Player2", PlayerType.Real);
-            var player3 = new HumanPlayer("Player3", PlayerType.Real);
-            var player4 = new HumanPlayer("Player4", PlayerType.Real);
+            var player1 = new HumanPlayer ("Player1");
+            var player2 = new HumanPlayer ("Player2");
+            var player3 = new HumanPlayer ("Player3");
+            var player4 = new HumanPlayer ("Player4");
 
             player1.Score = 300;
             player1.CurrentGamePhase = GamePhase.Entered;
@@ -99,10 +99,10 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player2DoesntOvertakePlayer1_WhenTheirScoreIsEqual()
         {
-            var player1 = new HumanPlayer("Player1", PlayerType.Real);
-            var player2 = new HumanPlayer("Player2", PlayerType.Real);
-            var player3 = new HumanPlayer("Player3", PlayerType.Real);
-            var player4 = new HumanPlayer("Player4", PlayerType.Real);
+            var player1 = new HumanPlayer ("Player1");
+            var player2 = new HumanPlayer ("Player2");
+            var player3 = new HumanPlayer ("Player3");
+            var player4 = new HumanPlayer ("Player4");
 
             player1.Score = 300;
             player1.CurrentGamePhase = GamePhase.Entered;
@@ -125,10 +125,10 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player2DoesntOvertakePlayer1_WhenEnteringTheGame()
         {
-            var player1 = new HumanPlayer("Player1", PlayerType.Real);
-            var player2 = new HumanPlayer("Player2", PlayerType.Real);
-            var player3 = new HumanPlayer("Player3", PlayerType.Real);
-            var player4 = new HumanPlayer("Player4", PlayerType.Real);
+            var player1 = new HumanPlayer("Player1");
+            var player2 = new HumanPlayer("Player2");
+            var player3 = new HumanPlayer("Player3");
+            var player4 = new HumanPlayer("Player4");
 
             player1.Score = 420;
             player1.CurrentGamePhase = GamePhase.Entered;
@@ -154,10 +154,10 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_PlayerThrewNothingPointable_GetsOvertakenByRestOfThePlayers()
         {
-            var player1 = new HumanPlayer("Player1", PlayerType.Real);
-            var player2 = new HumanPlayer("Player2", PlayerType.Real);
-            var player3 = new HumanPlayer("Player3", PlayerType.Real);
-            var player4 = new HumanPlayer("Player4", PlayerType.Real);
+            var player1 = new HumanPlayer ("Player1");
+            var player2 = new HumanPlayer ("Player2");
+            var player3 = new HumanPlayer ("Player3");
+            var player4 = new HumanPlayer ("Player4");
 
             player1.Score = 420;
             player1.CurrentGamePhase = GamePhase.Entered;
@@ -185,10 +185,10 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_Player3Overtakes2Players()
         {
-            var player1 = new HumanPlayer("Player1", PlayerType.Real);
-            var player2 = new HumanPlayer("Player2", PlayerType.Real);
-            var player3 = new HumanPlayer("Player3", PlayerType.Real);
-            var player4 = new HumanPlayer("Player4", PlayerType.Real);
+            var player1 = new HumanPlayer("Player1");
+            var player2 = new HumanPlayer("Player2");
+            var player3 = new HumanPlayer("Player3");
+            var player4 = new HumanPlayer("Player4");
 
             player1.Score = 420;
             player1.CurrentGamePhase = GamePhase.Entered;
