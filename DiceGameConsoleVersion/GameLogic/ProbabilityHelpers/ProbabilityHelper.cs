@@ -1,7 +1,8 @@
-﻿namespace DiceGameConsoleVersion.GameLogic
+﻿namespace DiceGameConsoleVersion.GameLogic.ProbabilityHelpers
 {
-    internal class ProbabilityHelper
+    public class ProbabilityHelper
     {
+        private List<MonteCarloCache> _cache = new();
         public static List<List<int>> GenerateDiceCombinations(int numOfDice)
         {
             List<List<int>> combinations = new();
@@ -25,25 +26,17 @@
             }
         }
 
-        public static double CalculateProbabilityOfThrowingHigherScore(int score, int alreadyPointedDice)
+        //this will be painful to write
+        public double CalculateProbabilityOfThrowingParticularScoreOrHigher(int score, int alreadyPointedDice)
         {
-            var allPossibleCombinations = GenerateDiceCombinations(6 - alreadyPointedDice);
-            var pointableCombinations = FindPointableCombinations(allPossibleCombinations);
-            var combinationsThatGiveScoreHigherThanWanted = 0;
-            foreach (var combination in pointableCombinations)
+            var probabilityFromCache = _cache.FirstOrDefault(x => x.DesiredPoints == score && x.DiceCount == alreadyPointedDice);
+            if (probabilityFromCache == null)
             {
-                var pointableDiceFromCombination = combination
-                    .GroupBy(n => n)
-                    .Select(g => new PointableDice(g.Key, g.Count()))
-                    .ToList();
-
-                if (PointingSystem.CalculatePointsFromDice(pointableDiceFromCombination) >= score)
-                {
-                    combinationsThatGiveScoreHigherThanWanted++;
-                }
+                var probability = MonteCarloGenerationHelper.SimulateDiceRolls(alreadyPointedDice, score);
+                _cache.Add(new MonteCarloCache(alreadyPointedDice, score, probability));
+                return probability;
             }
-
-            return Math.Round((double)combinationsThatGiveScoreHigherThanWanted / allPossibleCombinations.Count, 2);
+            return probabilityFromCache.Probability;
         }
 
         private static List<List<int>> FindPointableCombinations(List<List<int>> allCombinations)
@@ -70,7 +63,6 @@
         {
             var allCombinations = GenerateDiceCombinations(numberOfDiceToThrow);
             var pointableCombinations = FindPointableCombinations(allCombinations);
-            var unpointableCombinations = allCombinations.Except(pointableCombinations).ToList();
             return Math.Round((double)pointableCombinations.Count / allCombinations.Count, 2);
         }
     }

@@ -1,10 +1,18 @@
 ﻿using DiceGameConsoleVersion.Enums;
+using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
 using DiceGameConsoleVersion.Logic;
 namespace DiceGameConsoleVersion.Players
 {
-    internal class PlayerFactory
+    public class PlayerFactory
     {
-        public static IPlayer CreatePlayer(PlayerType playerType, string name, BotType? botType = null)
+        private readonly ProbabilityHelper _probabilityHelper;
+
+        public PlayerFactory(ProbabilityHelper probabilityHelper)
+        {
+            _probabilityHelper = probabilityHelper;
+        }
+
+        public IPlayer CreatePlayer(PlayerType playerType, string name, BotType? botType = null)
         {
             if (playerType == PlayerType.Human)
             {
@@ -20,7 +28,7 @@ namespace DiceGameConsoleVersion.Players
             {
                 BotType.NoRisk => new NoRiskBotPlayer(name),
                 BotType.LittleRisk => new LittleRiskBotPlayer(name),
-                BotType.ModerateRisk => new ModerateRiskBotPlayer(name),
+                BotType.ModerateRisk => new ModerateRiskBotPlayer(name, _probabilityHelper),
                 BotType.Risky => new RiskyBotPlayer(name),
                 _ => throw new ArgumentException("Unknown bot type"),
             };

@@ -1,7 +1,10 @@
 ﻿using DiceGameConsoleVersion.Enums;
 using DiceGameConsoleVersion.GameLogic;
+using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
 using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Players;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace DiceGameConsoleVersion
 {
@@ -9,13 +12,18 @@ namespace DiceGameConsoleVersion
     {
         public static void Main()
         {
-            var playerFactory = new PlayerFactory();
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddScoped<ProbabilityHelper>();
+            serviceCollection.AddScoped<PlayerFactory>();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            var probabilityHelper = serviceProvider.GetService<ProbabilityHelper>();
+            var playerFactory = new PlayerFactory(probabilityHelper!);
             var players = new List<IPlayer>
             {
-                PlayerFactory.CreatePlayer(PlayerType.Human, "Janek"),
-                PlayerFactory.CreatePlayer(PlayerType.Human, "Bartek"),
-                PlayerFactory.CreatePlayer(PlayerType.Human, "Czesiek"),
-                PlayerFactory.CreatePlayer(PlayerType.Bot, "Czesiek", BotType.ModerateRisk),
+                playerFactory.CreatePlayer(PlayerType.Human, "Janek"),
+                playerFactory.CreatePlayer(PlayerType.Human, "Bartek"),
+                playerFactory.CreatePlayer(PlayerType.Human, "Czesiek"),
+                playerFactory.CreatePlayer(PlayerType.Bot, "Czesiek", BotType.ModerateRisk),
             };
 
             var game = new Game(players);

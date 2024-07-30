@@ -1,16 +1,13 @@
 ﻿using DiceGameConsoleVersion.GameLogic;
 using DiceGameConsoleVersion.Logic;
+using DiceGameConsoleVersion.Models;
 using DiceGameConsoleVersion.Players;
 
 namespace DiceGameUnitTests.BotTests
 {
     public class LittleRiskBotPlayerTests
     {
-        private LittleRiskBotPlayer botPlayer = new("HumanPlayer1")
-        { 
-            Score = 100, 
-            CurrentGamePhase = DiceGameConsoleVersion.Models.GamePhase.Entered 
-        };
+        private LittleRiskBotPlayer botPlayer = new("HumanPlayer1");
 
         public static TheoryData<PointableDice[], PointableDice[], int> CalculatePointsFromDiceTestData =>
         new TheoryData<PointableDice[], PointableDice[], int>()
@@ -31,12 +28,166 @@ namespace DiceGameUnitTests.BotTests
             Assert.Equal(expectedChoose, diceChosenByBot);
         }
 
-        //[Theory]
-        //[MemberData(nameof(CalculatePointsFromDiceTestData))]
-        //public void LittleRiskBot_CheckIfBotEndsTurnCorrect(IEnumerable<PointableDice> diceThrown, IEnumerable<PointableDice> expectedChoose, int alreadyPointedDice)
-        //{
-        //    var diceChosenByBot = botPlayer.EndTurn(diceThrown.ToList(), new GameHistory(), alreadyPointedDice).ToList();
-        //    Assert.Equal(expectedChoose, diceChosenByBot);
-        //}
+        [Fact]
+        public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotHasntScoredInLast2Rounds()
+        {
+            var bot = new LittleRiskBotPlayer("Bot") { Score = 100, CurrentGamePhase = GamePhase.Entered };
+            var gameHistory = new GameHistory
+            {
+                History = new List<List<IPlayer>>
+                {
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 100, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 100, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 100, CurrentGamePhase = GamePhase.Entered },
+                        bot
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 150, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 130, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 200, CurrentGamePhase = GamePhase.Entered },
+                        bot
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 180, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 200, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 240, CurrentGamePhase = GamePhase.Entered },
+                        bot
+                    }
+                }
+            };
+
+            var turnEnded = bot.EndTurn(30, gameHistory, 3);
+            Assert.True(turnEnded);
+        }
+
+        [Fact]
+        public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotIsLast()
+        {
+            var bot = new LittleRiskBotPlayer("Bot") { Score = 280, CurrentGamePhase = GamePhase.Entered };
+            var gameHistory = new GameHistory
+            {
+                History = new List<List<IPlayer>>
+                {
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 200, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 200, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 200, CurrentGamePhase = GamePhase.Entered },
+                        new LittleRiskBotPlayer(bot.Name!) { Score = 200, CurrentGamePhase = GamePhase.Entered }
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 300, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 350, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 320, CurrentGamePhase = GamePhase.Entered },
+                        new LittleRiskBotPlayer(bot.Name!) { Score = 230, CurrentGamePhase = GamePhase.Entered }
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 350, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 400, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 600, CurrentGamePhase = GamePhase.Entered },
+                        bot
+                    }
+                }
+            };
+
+            var turnEnded = bot.EndTurn(30, gameHistory, 0);
+            Assert.True(turnEnded);
+        }
+
+        [Fact]
+        public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotIsFirstWithoutBigAdvantage()
+        {
+            var bot = new LittleRiskBotPlayer("Bot") { Score = 780, CurrentGamePhase = GamePhase.Entered };
+            var gameHistory = new GameHistory
+            {
+                History = new List<List<IPlayer>>
+                {
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 200, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 250, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 280, CurrentGamePhase = GamePhase.Entered },
+                        new LittleRiskBotPlayer(bot.Name!) { Score = 700, CurrentGamePhase = GamePhase.Entered }
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 230, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 280, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 330, CurrentGamePhase = GamePhase.Entered },
+                        new LittleRiskBotPlayer(bot.Name!) { Score = 750, CurrentGamePhase = GamePhase.Entered }
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 350, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 400, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 600, CurrentGamePhase = GamePhase.Entered },
+                        bot
+                    }
+                }
+            };
+
+            var turnEnded = bot.EndTurn(30, gameHistory, 0);
+            Assert.True(turnEnded);
+        }
+
+        [Fact]
+        public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotIsFirstWithBigAdvantage()
+        {
+            var bot = new LittleRiskBotPlayer("Bot") { Score = 810, CurrentGamePhase = GamePhase.Entered };
+            var gameHistory = new GameHistory
+            {
+                History = new List<List<IPlayer>>
+                {
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 200, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 250, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 280, CurrentGamePhase = GamePhase.Entered },
+                        new LittleRiskBotPlayer(bot.Name!) { Score = 700, CurrentGamePhase = GamePhase.Entered }
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 230, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 280, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 330, CurrentGamePhase = GamePhase.Entered },
+                        new LittleRiskBotPlayer(bot.Name!) { Score = 750, CurrentGamePhase = GamePhase.Entered }
+                    },
+                    new List<IPlayer>
+                    {
+                        new HumanPlayer("Chester") { Score = 350, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Steven") { Score = 400, CurrentGamePhase = GamePhase.Entered },
+                        new HumanPlayer("Jack") { Score = 600, CurrentGamePhase = GamePhase.Entered },
+                        bot
+                    }
+                }
+            };
+
+            var turnEnded = bot.EndTurn(30, gameHistory, 0);
+            Assert.False(turnEnded);
+        }
+
+        [Fact]
+        public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotIsFinishing()
+        {
+            var bot = new LittleRiskBotPlayer("Bot") { Score = 920, CurrentGamePhase = GamePhase.Finishing };
+
+            var turnEnded = bot.EndTurn(100, new GameHistory(), 0);
+            Assert.True(turnEnded);
+        }
+
+        [Fact]
+        public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotHasntEnteredTheGame()
+        {
+            var bot = new LittleRiskBotPlayer("Bot") { Score = 0, CurrentGamePhase = GamePhase.NotEntered };
+
+            var turnEnded = bot.EndTurn(100, new GameHistory(), 0);
+            Assert.True(turnEnded);
+        }
     }
 }

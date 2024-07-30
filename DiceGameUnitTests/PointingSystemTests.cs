@@ -212,5 +212,35 @@ namespace DiceGameUnitTests
             Assert.Equal(1, players.IndexOf(player1));
             Assert.Equal(2, players.IndexOf(player2));
         }
+
+        [Fact]
+        public void UpdateScoreboardTest_PlayerLosesPoints_ShouldChangeGamePhaseFromFinishingToEntered()
+        {
+            var player1 = new HumanPlayer("Player1");
+            var player2 = new HumanPlayer("Player2");
+            var player3 = new HumanPlayer("Player3");
+            var player4 = new HumanPlayer("Player4");
+
+            player1.Score = 900;
+            player1.CurrentGamePhase = GamePhase.Finishing;
+
+            player2.Score = 400;
+            player2.CurrentGamePhase = GamePhase.Entered;
+
+            player3.Score = 310;
+            player3.CurrentGamePhase = GamePhase.Entered;
+
+            player4.Score = 0;
+            player4.CurrentGamePhase = GamePhase.Entered;
+
+            var players = new List<IPlayer>
+            {
+                player1, player2, player3, player4
+            };
+
+           PointingSystem.UpdateScoreboard(players, player1, -50);
+
+            Assert.Equal(GamePhase.Entered, player1.CurrentGamePhase);
+        }
     }
 }

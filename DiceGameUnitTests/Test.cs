@@ -65,12 +65,13 @@ namespace DiceGameUnitTests
         [Fact]
         public void DumbTest()
         {
-            var probability = CalculateProbabilityOfThrowingSomethingPointable(6);
-            var probability1 = CalculateProbabilityOfThrowingSomethingPointable(5);
-            var probability2 = CalculateProbabilityOfThrowingSomethingPointable(4);
-            var probability3 = CalculateProbabilityOfThrowingSomethingPointable(3);
-            var probability4 = CalculateProbabilityOfThrowingSomethingPointable(2);
-            var probability5 = CalculateProbabilityOfThrowingSomethingPointable(1);
+            var probability = CalculateProbabilityOfThrowingSomethingPointable(6) *
+                CalculateProbabilityOfThrowingSomethingPointable(5) *
+                CalculateProbabilityOfThrowingSomethingPointable(4) *
+                CalculateProbabilityOfThrowingSomethingPointable(3) *
+                CalculateProbabilityOfThrowingSomethingPointable(2) *
+                CalculateProbabilityOfThrowingSomethingPointable(1);
+
             var x = 0;
         }
     }

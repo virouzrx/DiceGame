@@ -1,19 +1,22 @@
 ﻿using DiceGameConsoleVersion.GameLogic;
+using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
 using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Models;
 
 namespace DiceGameConsoleVersion.Players
 {
-    internal class ModerateRiskBotPlayer : IPlayer
+    public class ModerateRiskBotPlayer : IPlayer
     {
         public string? Name { get; init; }
         public int Score { get; set; }
         public GamePhase CurrentGamePhase { get; set; }
         public int MoveNumber { get; set; }
+        public readonly ProbabilityHelper _probabilityHelper;
 
-        public ModerateRiskBotPlayer(string name)
+        public ModerateRiskBotPlayer(string name, ProbabilityHelper helper)
         {
             Name = name;
+            _probabilityHelper = helper;
         }
 
         public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory history, int alreadyPointedDice)
@@ -66,38 +69,41 @@ namespace DiceGameConsoleVersion.Players
             var currentLeaderboard = gameHistory.GetLastHistoryItem();
             if (CurrentGamePhase == GamePhase.NotEntered)
             {
-                if (!currentLeaderboard.Any(x => x.CurrentGamePhase != GamePhase.NotEntered))
+                if (roundScore < 100)
                 {
-                    return roundScore > 120 || ProbabilityHelper.CalculateProbabilityOfThrowingSomethingPointable(alreadyPointedDice) < 70;
+                    Console.WriteLine($"{Name} score is {roundScore}");
+                    return false;
                 }
 
-                if (!currentLeaderboard
+                if (!currentLeaderboard.Any(x => x.CurrentGamePhase != GamePhase.NotEntered))
+                {
+                    var probability = ProbabilityHelper.CalculateProbabilityOfThrowingSomethingPointable(6 - alreadyPointedDice);
+                    return roundScore > 120 || probability < 0.7;
+                }
+
+                if (currentLeaderboard
                     .Where(x => x.Name != Name)
                     .All(x => x.CurrentGamePhase != GamePhase.NotEntered))
                 {
                     return true;
                 }
 
-                if (roundScore < FindClosestScoreToPlayersScore(currentLeaderboard, roundScore))
-                {
-                    return ProbabilityHelper.CalculateProbabilityOfThrowingSomethingPointable(alreadyPointedDice) < 70;
-                }
-                return true;
-
+                return !CanPlayerBeOvertakenOnEnteringTheGame(currentLeaderboard, roundScore, alreadyPointedDice);
             }
             else if (CurrentGamePhase == GamePhase.Entered)
             {
                 if (Score > 800 && Score < 900)
                 {
-                    return Score + roundScore < 870 || Score + roundScore > 940;
+                    return Score + roundScore <= 895 || Score + roundScore > 940;
                 }
 
-                if (!gameHistory.PlayerScoredInLastRounds(Name!, 2))
+                if (gameHistory.History.Count >= 3 && !gameHistory.PlayerScoredInLastRounds(Name!, 3))
                 {
                     return true;
                 }
 
-                return !ShouldRisk(currentLeaderboard);
+
+                return !ShouldRisk(currentLeaderboard, roundScore, alreadyPointedDice) && alreadyPointedDice <= 3;
             }
             else
             {
@@ -115,9 +121,9 @@ namespace DiceGameConsoleVersion.Players
             return alreadyPointedDice == 2 || diceToPoint.Where(x => x.Score != 2).Sum(x => x.DiceCount) >= 2;
         }
 
-        private static bool CheckProbabilityOfThrowingHigherScore(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice, int desiredProbability)
+        private bool CheckProbabilityOfThrowingHigherScore(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice, int desiredProbability)
         {
-            return ProbabilityHelper.CalculateProbabilityOfThrowingHigherScore(
+            return _probabilityHelper.CalculateProbabilityOfThrowingParticularScoreOrHigher(
                     PointingSystem.CalculatePointsFromDice(diceToPoint), alreadyPointedDice) >= desiredProbability;
         }
 
@@ -128,29 +134,37 @@ namespace DiceGameConsoleVersion.Players
                         : new[] { new PointableDice(5, 1) };
         }
 
-        private static int FindClosestScoreToPlayersScore(List<IPlayer> players, int score)
+        private static bool CanPlayerBeOvertakenOnEnteringTheGame(List<IPlayer> players, int score, int alreadyPointedDice)
         {
-            return players
-                .OrderBy(n => Math.Abs(n.Score - score))
-                .First().Score;
+            var playersThatEnteredTheGame = players
+                .Where(x => x.CurrentGamePhase != GamePhase.NotEntered)
+                .OrderBy(x => x.Score);
+            if (playersThatEnteredTheGame.First().Score > score)
+            {
+                return playersThatEnteredTheGame.First().Score - score < 30
+                    && ProbabilityHelper.CalculateProbabilityOfThrowingSomethingPointable(6 - alreadyPointedDice) > 0.7;
+            }
+            return false;
         }
 
-        private bool ShouldRisk(List<IPlayer> players)
+        private bool ShouldRisk(List<IPlayer> players, int roundScore, int alreadyPointedDice)
         {
             var index = players.IndexOf(this);
+            var playerRoundscore = Score + roundScore;
             if (index == 0)
             {
-                if (Score - players[1].Score > 70)
+                if (playerRoundscore - players[1].Score > 100)
                 {
                     return true;
                 }
             }
 
-            if (index != players.Count - 1 && 
-                players[index - 1].Score - Score <= 45 && 
-                Score - players[index + 1].Score > 75)
+            if (index != players.Count - 1 && //not last
+                players[index - 1].Score - playerRoundscore <= 75 &&
+                playerRoundscore - players[index + 1].Score >= 100)
             {
-                return true;
+                return _probabilityHelper.CalculateProbabilityOfThrowingParticularScoreOrHigher(
+                    players[index - 1].Score - playerRoundscore, alreadyPointedDice) >= 0.6;
             }
 
             return false;

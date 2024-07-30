@@ -1,7 +1,6 @@
 ﻿using DiceGameConsoleVersion.GameLogic;
 using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Models;
-using System;
 
 namespace DiceGameConsoleVersion.Players
 {
@@ -63,61 +62,51 @@ namespace DiceGameConsoleVersion.Players
         {
             if (CurrentGamePhase == GamePhase.Entered)
             {
-                if (roundScore < 30 || alreadyPointedDice == 0 || alreadyPointedDice == 6)
+                if (roundScore < 30)
                 {
                     Console.WriteLine($"{Name} score is {roundScore}");
                     return false;
                 }
 
-                if (!gameHistory.PlayerScoredInLastRounds(Name!, 3)) 
+                if (!gameHistory.PlayerScoredInLastRounds(Name!, 2))
                 {
                     return true;
                 }
 
-                var scoreBoard = gameHistory.GetLastHistoryItem();
-                var playerIndex = scoreBoard.IndexOf(scoreBoard.First(x => x.Name == Name));
-                if (playerIndex == scoreBoard.Count - 1)
+                if (gameHistory.IsPlayerLast(Name!))
                 {
                     return true;
                 }
 
-                return ShouldRisk(gameHistory.GetLastHistoryItem());
+                return !ShouldRisk(gameHistory.GetLastHistoryItem());
             }
             else
             {
-                if (roundScore < 100)
+                if (roundScore >= 100)
                 {
-                    Console.WriteLine($"{Name} score is {roundScore}");
-                    return false;
-                }
-                else
-                {
-                    if (CurrentGamePhase == GamePhase.Finishing)
-                    {
-                        CurrentGamePhase = GamePhase.Finished;
-                        return true;
-                    }
                     return true;
                 }
+                Console.WriteLine($"{Name} score is {roundScore}");
+                return false;
             }
         }
 
         private bool ShouldRisk(List<IPlayer> players)
         {
-            var index = players.IndexOf(this);
+            var index = players.FindIndex(x => x.Name == Name);
             if (index == 0)
             {
-                if (Score - players[1].Score > 200)
-                {
-                    return true;
-                }
-            }
-            if (index != players.Count - 1 && players[index - 1].Score - Score <= 45 && Score - players[index + 1].Score > 75) 
-            {
-                return true;
+                return Score - players[1].Score > 200;
             }
 
-            return false;
+            return ArePlayersWithinScoreRange(players, index);
+        }
+
+        private bool ArePlayersWithinScoreRange(List<IPlayer> players, int index) 
+        {
+            return index != players.Count - 1
+                && players[index - 1].Score - Score <= 45
+                && Score - players[index + 1].Score > 75;
         }
     }
 }
