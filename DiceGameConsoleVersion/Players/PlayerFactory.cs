@@ -1,5 +1,4 @@
-﻿using DiceGame.Common.Enums;
-using DiceGame.Common.GameLogic.ProbabilityHelpers;
+﻿using DiceGame.Common.Players.Bots;
 
 namespace DiceGame.Common.Players
 {

@@ -1,6 +1,9 @@
-﻿namespace DiceGameConsoleVersion.Players.Bots
+﻿using DiceGame.Common.Enums;
+using DiceGame.Common.GameLogic;
+
+namespace DiceGame.Common.Players.Bots
 {
-    internal class RiskyBotPlayer : IPlayer
+    public class RiskyBotPlayer : IPlayer
     {
         public string? Name { get; init; }
         public int Score { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace DiceGameUnitTests.BotTests
+﻿using DiceGame.Common.Players.Bots;
+
+namespace DiceGameUnitTests.BotTests
 {
     public class ModerateRiskBotPlayerTests
     {

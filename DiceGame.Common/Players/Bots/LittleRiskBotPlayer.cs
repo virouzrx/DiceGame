@@ -1,8 +1,7 @@
 ﻿using DiceGame.Common.Enums;
 using DiceGame.Common.GameLogic;
-using DiceGame.Common.Players;
 
-namespace DiceGameConsoleVersion.Players.Bots
+namespace DiceGame.Common.Players.Bots
 {
     public class LittleRiskBotPlayer : IPlayer
     {
