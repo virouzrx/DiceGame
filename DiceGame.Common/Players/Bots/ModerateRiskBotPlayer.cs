@@ -1,4 +1,7 @@
-﻿using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
+﻿using DiceGame.Common.Enums;
+using DiceGame.Common.GameLogic;
+using DiceGame.Common.GameLogic.ProbabilityHelpers;
+using DiceGame.Common.Players;
 
 namespace DiceGameConsoleVersion.Players.Bots
 {

@@ -1,5 +1,6 @@
 ﻿global using DiceGameConsoleVersion.Logic;
-global using DiceGameConsoleVersion.Models;
 global using DiceGameConsoleVersion.Utilities;
-global using DiceGameConsoleVersion.GameLogic;
-
+global using DiceGame.Common.Enums;
+global using DiceGame.Common.GameLogic.ProbabilityHelpers;
+global using DiceGame.Common.Players;
+global using DiceGame.Common.GameLogic;

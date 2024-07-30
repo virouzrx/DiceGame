@@ -1,4 +1,4 @@
-﻿namespace DiceGameConsoleVersion.Enums
+﻿namespace DiceGame.Common.Enums
 {
     public enum PlayerType
     {

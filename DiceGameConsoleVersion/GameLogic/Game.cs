@@ -1,4 +1,7 @@
-﻿namespace DiceGameConsoleVersion.GameLogic
+﻿using DiceGame.Common.Enums;
+using DiceGame.Common.Players;
+
+namespace DiceGame.Common.GameLogic
 {
     public class Game
     {

@@ -5,7 +5,7 @@ namespace DiceGameUnitTests
     public class MonteCarloTests
     {
         [Fact]
-        public async Task RunMonteCarloSimulation()
+        public void RunMonteCarloSimulation()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();

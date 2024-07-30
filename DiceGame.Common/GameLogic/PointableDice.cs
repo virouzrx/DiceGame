@@ -1,4 +1,4 @@
-﻿namespace DiceGameConsoleVersion.GameLogic
+﻿namespace DiceGame.Common.GameLogic
 {
     public class PointableDice
     {

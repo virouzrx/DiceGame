@@ -1,4 +1,4 @@
-﻿namespace DiceGameConsoleVersion.GameLogic.ProbabilityHelpers
+﻿namespace DiceGame.Common.GameLogic.ProbabilityHelpers
 {
     public class MonteCarloGenerationHelper
     {
@@ -82,7 +82,7 @@
 
                 for (var j = 0; j < n; j++)
                 {
-                    if ((i & (1 << j)) != 0)
+                    if ((i & 1 << j) != 0)
                     {
                         subset.Add(choices[j]);
                     }

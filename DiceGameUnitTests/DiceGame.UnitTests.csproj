@@ -22,7 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DiceGameConsoleVersion\DiceGameConsoleVersion.csproj" />
+    <ProjectReference Include="..\DiceGame.Common\DiceGame.Common.csproj" />
+    <ProjectReference Include="..\DiceGameConsoleVersion\DiceGame.ConsoleVersion.csproj" />
   </ItemGroup>
 
 </Project>

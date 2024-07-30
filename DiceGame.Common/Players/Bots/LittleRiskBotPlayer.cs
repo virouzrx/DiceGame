@@ -1,4 +1,8 @@
-﻿namespace DiceGameConsoleVersion.Players.Bots
+﻿using DiceGame.Common.Enums;
+using DiceGame.Common.GameLogic;
+using DiceGame.Common.Players;
+
+namespace DiceGameConsoleVersion.Players.Bots
 {
     public class LittleRiskBotPlayer : IPlayer
     {

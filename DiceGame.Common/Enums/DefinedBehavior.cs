@@ -1,4 +1,4 @@
-﻿namespace DiceGameConsoleVersion.Models
+﻿namespace DiceGame.Common.Enums
 {
     public enum DefinedBehavior
     {

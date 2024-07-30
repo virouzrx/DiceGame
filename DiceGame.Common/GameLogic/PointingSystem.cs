@@ -1,6 +1,8 @@
-﻿using static DiceGameConsoleVersion.Utilities.Extensions;
+﻿using DiceGame.Common;
+using DiceGame.Common.Enums;
+using DiceGame.Common.Players;
 
-namespace DiceGameConsoleVersion.GameLogic
+namespace DiceGame.Common.GameLogic
 {
     public class PointingSystem
     {

@@ -1,4 +1,6 @@
-﻿namespace DiceGameConsoleVersion.GameLogic
+﻿using DiceGame.Common.Players;
+
+namespace DiceGame.Common.GameLogic
 {
     public class GameHistory
     {
@@ -16,7 +18,7 @@
                 .Count() > 1;
         }
 
-        public void UpdatePlayer(IPlayer player) 
+        public void UpdatePlayer(IPlayer player)
         {
             var playerToUpdate = History.Last().Where(p => p.Name == player.Name).First();
             playerToUpdate.Score = player.Score;

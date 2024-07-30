@@ -1,4 +1,7 @@
-﻿namespace DiceGameConsoleVersion.Logic
+﻿using DiceGame.Common.Enums;
+using DiceGame.Common.GameLogic;
+
+namespace DiceGame.Common.Players
 {
     public interface IPlayer
     {

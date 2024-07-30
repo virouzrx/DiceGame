@@ -6,12 +6,6 @@ namespace DiceGameConsoleVersion.Utilities
     {
         private const string entireInputMatch = @"^\(\d,[1-6]\)(,\(\d,[1-6]\))*$";
         private const string multipleValuesPattern = @"\((?:[1-6],[1-6](?:,\s*)?)+\)"; //this should validate both if the format is correct and if the player chose correct dice
-        private Dictionary<int, int> SingleDicePoints { get; set; }
-
-        public ConsoleManagement(Dictionary<int, int> singleDicePoints)
-        {
-            SingleDicePoints = singleDicePoints;
-        }
 
         public static IEnumerable<string> GetInputAndRetrieveValues()
         {

@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
+﻿using DiceGame.Common.Players;
+using System.Text.Json;
 
-namespace DiceGameConsoleVersion.Utilities
+namespace DiceGame.Common
 {
     public static class Extensions
     {

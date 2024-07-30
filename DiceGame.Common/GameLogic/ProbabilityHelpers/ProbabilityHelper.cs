@@ -1,4 +1,4 @@
-﻿namespace DiceGameConsoleVersion.GameLogic.ProbabilityHelpers
+﻿namespace DiceGame.Common.GameLogic.ProbabilityHelpers
 {
     public class ProbabilityHelper
     {
