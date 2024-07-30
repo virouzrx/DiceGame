@@ -1,6 +1,4 @@
-﻿using DiceGameConsoleVersion.Utilities;
-
-namespace DiceGameConsoleVersion.GameLogic.ProbabilityHelpers
+﻿namespace DiceGameConsoleVersion.GameLogic.ProbabilityHelpers
 {
     public class MonteCarloGenerationHelper
     {

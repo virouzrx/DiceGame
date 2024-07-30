@@ -1,8 +1,4 @@
-﻿using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
-using DiceGameConsoleVersion.Utilities;
-
-namespace DiceGameConsoleVersion.GameLogic
+﻿namespace DiceGameConsoleVersion.GameLogic
 {
     public class Game
     {

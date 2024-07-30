@@ -1,7 +1,3 @@
-using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
-
 namespace DiceGameUnitTests
 {
     public class PointingSystemTests

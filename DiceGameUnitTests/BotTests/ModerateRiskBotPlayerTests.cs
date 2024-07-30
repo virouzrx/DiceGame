@@ -1,10 +1,4 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
-using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
-using DiceGameConsoleVersion.Players;
-
-namespace DiceGameUnitTests.BotTests
+﻿namespace DiceGameUnitTests.BotTests
 {
     public class ModerateRiskBotPlayerTests
     {

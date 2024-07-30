@@ -1,5 +1,4 @@
-﻿using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace DiceGameUnitTests
 {

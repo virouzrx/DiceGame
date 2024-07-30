@@ -1,6 +1,5 @@
 ﻿using DiceGameConsoleVersion.Enums;
 using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
-using DiceGameConsoleVersion.Logic;
 namespace DiceGameConsoleVersion.Players
 {
     public class PlayerFactory

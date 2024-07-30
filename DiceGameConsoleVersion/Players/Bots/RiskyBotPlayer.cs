@@ -1,12 +1,8 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
-
-namespace DiceGameConsoleVersion.Players
+﻿namespace DiceGameConsoleVersion.Players.Bots
 {
     internal class RiskyBotPlayer : IPlayer
     {
-        public string? Name { get; init;}
+        public string? Name { get; init; }
         public int Score { get; set; }
         public GamePhase CurrentGamePhase { get; set; }
         public int MoveNumber { get; set; }

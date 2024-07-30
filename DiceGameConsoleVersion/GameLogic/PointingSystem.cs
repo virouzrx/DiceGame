@@ -1,7 +1,4 @@
-﻿using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
-using DiceGameConsoleVersion.Utilities;
-using static DiceGameConsoleVersion.Utilities.Extensions;
+﻿using static DiceGameConsoleVersion.Utilities.Extensions;
 
 namespace DiceGameConsoleVersion.GameLogic
 {
@@ -13,6 +10,7 @@ namespace DiceGameConsoleVersion.GameLogic
             { 5, 5 }
         };
 
+        //todo: write tests
         public static int CalculatePointsFromDice(int dieScore, int count)
         {
             var diePointValue = dieScore == 1 ? 10 : dieScore;

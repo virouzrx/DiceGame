@@ -1,8 +1,4 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
-
-namespace DiceGameConsoleVersion.Players
+﻿namespace DiceGameConsoleVersion.Players.Bots
 {
     internal class NoRiskBotPlayer : IPlayer
     {

@@ -1,8 +1,4 @@
-﻿using DiceGameConsoleVersion.Logic;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace DiceGameConsoleVersion.Utilities
 {
@@ -14,7 +10,7 @@ namespace DiceGameConsoleVersion.Utilities
                 throw new ArgumentNullException(nameof(obj));
             string jsonString = JsonSerializer.Serialize(obj);
 
-            return JsonSerializer.Deserialize<T>(jsonString);
+            return JsonSerializer.Deserialize<T>(jsonString)!;
         }
 
         public static List<IPlayer> OrderByScore(this List<IPlayer> playerList)

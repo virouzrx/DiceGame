@@ -1,7 +1,4 @@
-﻿using DiceGameConsoleVersion.Logic;
-using System.Xml.Linq;
-
-namespace DiceGameConsoleVersion.GameLogic
+﻿namespace DiceGameConsoleVersion.GameLogic
 {
     public class PointableDice
     {

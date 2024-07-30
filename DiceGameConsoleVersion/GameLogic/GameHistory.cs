@@ -1,11 +1,10 @@
-﻿using DiceGameConsoleVersion.Logic;
-
-namespace DiceGameConsoleVersion.GameLogic
+﻿namespace DiceGameConsoleVersion.GameLogic
 {
     public class GameHistory
     {
         public List<List<IPlayer>> History { get; set; } = new List<List<IPlayer>>();
 
+        //todo: write tests
         public bool PlayerScoredInLastRounds(string playerName, int roundsAmountToCheck)
         {
             return History

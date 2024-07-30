@@ -1,6 +1,4 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Logic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace DiceGameConsoleVersion.Utilities
 {

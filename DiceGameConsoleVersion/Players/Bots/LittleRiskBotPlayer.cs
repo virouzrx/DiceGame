@@ -1,8 +1,4 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
-
-namespace DiceGameConsoleVersion.Players
+﻿namespace DiceGameConsoleVersion.Players.Bots
 {
     public class LittleRiskBotPlayer : IPlayer
     {
@@ -27,7 +23,7 @@ namespace DiceGameConsoleVersion.Players
                     return diceToPoint;
                 }
 
-                if (die.DiceCount > 2 || (diceToPoint.Count() == 2 && alreadyPointedDice >= 3))
+                if (die.DiceCount > 2 || diceToPoint.Count() == 2 && alreadyPointedDice >= 3)
                 {
                     return diceToPoint;
                 }
@@ -102,7 +98,7 @@ namespace DiceGameConsoleVersion.Players
             return ArePlayersWithinScoreRange(players, index);
         }
 
-        private bool ArePlayersWithinScoreRange(List<IPlayer> players, int index) 
+        private bool ArePlayersWithinScoreRange(List<IPlayer> players, int index)
         {
             return index != players.Count - 1
                 && players[index - 1].Score - Score <= 45

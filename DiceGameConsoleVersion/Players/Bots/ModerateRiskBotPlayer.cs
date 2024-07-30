@@ -1,9 +1,6 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
-using DiceGameConsoleVersion.Logic;
-using DiceGameConsoleVersion.Models;
+﻿using DiceGameConsoleVersion.GameLogic.ProbabilityHelpers;
 
-namespace DiceGameConsoleVersion.Players
+namespace DiceGameConsoleVersion.Players.Bots
 {
     public class ModerateRiskBotPlayer : IPlayer
     {

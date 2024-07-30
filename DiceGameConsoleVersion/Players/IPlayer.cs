@@ -1,7 +1,4 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Models;
-
-namespace DiceGameConsoleVersion.Logic
+﻿namespace DiceGameConsoleVersion.Logic
 {
     public interface IPlayer
     {

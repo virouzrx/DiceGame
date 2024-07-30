@@ -1,7 +1,7 @@
 ﻿using DiceGameConsoleVersion.GameLogic;
 using DiceGameConsoleVersion.Logic;
 using DiceGameConsoleVersion.Models;
-using DiceGameConsoleVersion.Players;
+using DiceGameConsoleVersion.Players.Bots;
 
 namespace DiceGameUnitTests.BotTests
 {

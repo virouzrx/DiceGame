@@ -1,8 +1,4 @@
-﻿using DiceGameConsoleVersion.GameLogic;
-using DiceGameConsoleVersion.Models;
-using DiceGameConsoleVersion.Utilities;
-
-namespace DiceGameConsoleVersion.Logic
+﻿namespace DiceGameConsoleVersion.Logic
 {
     public class HumanPlayer : IPlayer
     {
