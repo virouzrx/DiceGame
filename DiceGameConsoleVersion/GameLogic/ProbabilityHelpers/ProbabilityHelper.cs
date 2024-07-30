@@ -2,7 +2,7 @@
 {
     public class ProbabilityHelper
     {
-        private List<MonteCarloCache> _cache = new();
+        private readonly List<MonteCarloCache> _cache = new();
         public static List<List<int>> GenerateDiceCombinations(int numOfDice)
         {
             List<List<int>> combinations = new();

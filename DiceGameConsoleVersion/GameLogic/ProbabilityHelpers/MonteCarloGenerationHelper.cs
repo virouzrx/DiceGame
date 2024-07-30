@@ -39,11 +39,6 @@ namespace DiceGameConsoleVersion.GameLogic.ProbabilityHelpers
                 return (1, 0);
             }
 
-            if (remainingDice == 0)
-            {
-                return (0, 1);
-            }
-
             var roll = _random.Throw(remainingDice);
             var dice = PointingSystem.FindDiceToPoint(roll).ToList();
             var choices = GetAllCombinationsOfChoices(dice.ToList());

@@ -164,7 +164,7 @@ namespace DiceGameConsoleVersion.Players
                 playerRoundscore - players[index + 1].Score >= 100)
             {
                 return _probabilityHelper.CalculateProbabilityOfThrowingParticularScoreOrHigher(
-                    players[index - 1].Score - playerRoundscore, alreadyPointedDice) >= 0.6;
+                    players[index - 1].Score - playerRoundscore, 6 - alreadyPointedDice) >= 0.4;
             }
 
             return false;
