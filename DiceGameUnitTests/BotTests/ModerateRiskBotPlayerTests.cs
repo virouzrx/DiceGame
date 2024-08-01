@@ -210,5 +210,110 @@ namespace DiceGameUnitTests.BotTests
             var turnEnded = bot.EndTurn(30, gameHistory, 1);
             Assert.False(turnEnded);
         }
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_WhenSetWithTwosGive45OrMorePoints()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(2, 4), new PointableDice(5, 1) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 1);
+            Assert.Equal(dice, diceChosen);
+        }
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_WhenSetOfTwosGiveLessThan45Points()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(2, 3), new PointableDice(5, 1) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 1);
+            Assert.Equal(new[] { new PointableDice(5, 1) }, diceChosen);
+        }
+
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_TwoDiceOfTheSameScoreAreThrown_AndMoreThan3DiceWerePointed()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(1, 2) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 3);
+            Assert.Equal(dice, diceChosen);
+        }
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_TwoDiceOfTheSameScoreAreThrown_AndLessThan3DiceWerePointed()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(1, 2) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 1);
+            Assert.Equal(new[] { new PointableDice(1, 1) }, diceChosen);
+        }
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_WhenTripletIsThrown()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(5, 3) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 2);
+            Assert.Equal(dice, diceChosen);
+        }
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_When1And5AreThrown()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(1, 1), new PointableDice(5,1) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 2);
+            Assert.Equal(new[] { new PointableDice(1,1)}, diceChosen);
+        }
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_When3DifferentPointableDiceAreThrown_ButPlayerCanAchieveHigherScore()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(1, 1), new PointableDice(5, 1), new PointableDice(2,3) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 4);
+            Assert.Equal(new[] { new PointableDice(1, 1) }, diceChosen);
+        }
+
+        [Fact]
+        public void ModerateRiskBot_ChooseDiceTest_When3DifferentPointableDiceAreThrown_AndChancesForHigherScoreAreLow()
+        {
+            var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper) { Score = 200, CurrentGamePhase = GamePhase.Entered };
+
+            var gameHistory = new GameHistory();
+
+            var dice = new[] { new PointableDice(1, 1), new PointableDice(5, 1), new PointableDice(5, 3) };
+
+            var diceChosen = bot.ChooseDice(dice, gameHistory, 2);
+            Assert.Equal(dice, diceChosen);
+        }
     }
 }

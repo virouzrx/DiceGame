@@ -1,5 +1,6 @@
 ﻿using DiceGame.Common.Enums;
 using DiceGame.Common.Players;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DiceGame.Common.GameLogic
 {
@@ -89,10 +90,31 @@ namespace DiceGame.Common.GameLogic
                     alreadyPointedDice += diceChose.Sum(x => x.DiceCount);
                     var tempscore = PointingSystem.CalculatePointsFromDice(diceChose);
                     playerScore += tempscore;
-                    playerEndendTheirTurn = player.EndTurn(playerScore, GameHistory, alreadyPointedDice);
+                    if ((playerScore >= 100 && player.CurrentGamePhase == GamePhase.Finishing) || playerScore + player.Score >= 1000)
+                    {
+                        return playerScore;
+                    }
+                    if (CheckIfPlayerCanFinishTheTurn(player.CurrentGamePhase, playerScore))
+                    {
+                        playerEndendTheirTurn = player.EndTurn(playerScore, GameHistory, alreadyPointedDice);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{player.Name}'s score is {playerScore}");
+                    }
                 }
             }
             return playerScore;
+        }
+
+        private static bool CheckIfPlayerCanFinishTheTurn(GamePhase gamePhase, int score)
+        {
+            return gamePhase switch
+            {
+                GamePhase.NotEntered or GamePhase.Finishing => score >= 100,
+                GamePhase.Entered => score >= 30,
+                _ => throw new ArgumentException("Player with wrong gamephase was present in the game"),
+            };
         }
     }
 }

@@ -61,12 +61,6 @@ namespace DiceGame.Common.Players.Bots
         {
             if (CurrentGamePhase == GamePhase.Entered)
             {
-                if (roundScore < 30)
-                {
-                    Console.WriteLine($"{Name} score is {roundScore}");
-                    return false;
-                }
-
                 if (!gameHistory.PlayerScoredInLastRounds(Name!, 2))
                 {
                     return true;
@@ -76,18 +70,8 @@ namespace DiceGame.Common.Players.Bots
                 {
                     return true;
                 }
-
-                return !ShouldRisk(gameHistory.GetLastHistoryItem());
             }
-            else
-            {
-                if (roundScore >= 100)
-                {
-                    return true;
-                }
-                Console.WriteLine($"{Name} score is {roundScore}");
-                return false;
-            }
+            return !ShouldRisk(gameHistory.GetLastHistoryItem());
         }
 
         private bool ShouldRisk(List<IPlayer> players)

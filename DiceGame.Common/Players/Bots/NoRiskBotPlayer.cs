@@ -22,7 +22,7 @@ namespace DiceGame.Common.Players.Bots
 
         public bool EndTurn(int roundScore, GameHistory gameHistory, int alreadyPointedDice)
         {
-            return roundScore >= 30;
+            return true;
         }
     }
 }

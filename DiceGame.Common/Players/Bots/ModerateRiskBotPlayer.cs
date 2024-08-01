@@ -24,22 +24,19 @@ namespace DiceGame.Common.Players.Bots
             {
                 var die = diceToPoint.First();
 
-                if (die.DiceCount == 1) //5 or 1
+                if (die.DiceCount == 1 || die.DiceCount >= 3 || alreadyPointedDice >= 3)
                 {
                     return diceToPoint;
                 }
 
-                if (die.DiceCount > 3 || alreadyPointedDice < 3) //1,1 or 5,5
-                {
-                    return diceToPoint;
-                }
-
+                //(1,2), (5,2)
                 return new[] { new PointableDice(die.Score, 1) };
             }
 
+            //rare situation where there are 3 different dice and 
             if (diceToPoint.Count() == 3)
             {
-                if (CheckProbabilityOfThrowingHigherScore(diceToPoint, alreadyPointedDice, 70))
+                if (CheckProbabilityOfThrowingHigherScore(diceToPoint, 6 - alreadyPointedDice, 0.4))
                 {
                     return Get1Or5(diceToPoint);
                 }
@@ -47,6 +44,11 @@ namespace DiceGame.Common.Players.Bots
 
             if (diceToPoint.Any(x => x.Score == 2))
             {
+                if (PointingSystem.CalculatePointsFromDice(diceToPoint) > 40)
+                {
+                    return diceToPoint;
+                }
+
                 if (ShouldPlayerTakeTripletOfTwos(alreadyPointedDice, diceToPoint))
                 {
                     return diceToPoint;
@@ -55,7 +57,7 @@ namespace DiceGame.Common.Players.Bots
                 return Get1Or5(diceToPoint);
             }
 
-            if (PointingSystem.CalculatePointsFromDice(diceToPoint) > 45)
+            if (PointingSystem.CalculatePointsFromDice(diceToPoint) > 40 || alreadyPointedDice >= 3)
             {
                 return diceToPoint;
             }
@@ -68,12 +70,6 @@ namespace DiceGame.Common.Players.Bots
             var currentLeaderboard = gameHistory.GetLastHistoryItem();
             if (CurrentGamePhase == GamePhase.NotEntered)
             {
-                if (roundScore < 100)
-                {
-                    Console.WriteLine($"{Name} score is {roundScore}");
-                    return false;
-                }
-
                 if (!currentLeaderboard.Any(x => x.CurrentGamePhase != GamePhase.NotEntered))
                 {
                     var probability = ProbabilityHelper.CalculateProbabilityOfThrowingSomethingPointable(6 - alreadyPointedDice);
@@ -91,6 +87,11 @@ namespace DiceGame.Common.Players.Bots
             }
             else if (CurrentGamePhase == GamePhase.Entered)
             {
+                if (alreadyPointedDice == 6 || alreadyPointedDice == 0)
+                {
+                    return true;
+                }
+                
                 if (Score > 800 && Score < 900)
                 {
                     return Score + roundScore <= 895 || Score + roundScore > 940;
@@ -101,26 +102,19 @@ namespace DiceGame.Common.Players.Bots
                     return true;
                 }
 
-
                 return !ShouldRisk(currentLeaderboard, roundScore, alreadyPointedDice) && alreadyPointedDice <= 3;
             }
-            else
-            {
-                if (roundScore < 100)
-                {
-                    Console.WriteLine($"{Name} score is {roundScore}");
-                    return false;
-                }
-                return true;
-            }
+            return true;
         }
 
         private static bool ShouldPlayerTakeTripletOfTwos(int alreadyPointedDice, IEnumerable<PointableDice> diceToPoint)
         {
-            return alreadyPointedDice == 2 || diceToPoint.Where(x => x.Score != 2).Sum(x => x.DiceCount) >= 2;
+            return alreadyPointedDice == 2 || diceToPoint
+                .Where(x => x.Score != 2)
+                .Sum(x => x.DiceCount) >= 2;
         }
 
-        private bool CheckProbabilityOfThrowingHigherScore(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice, int desiredProbability)
+        private bool CheckProbabilityOfThrowingHigherScore(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice, double desiredProbability)
         {
             return _probabilityHelper.CalculateProbabilityOfThrowingParticularScoreOrHigher(
                     PointingSystem.CalculatePointsFromDice(diceToPoint), alreadyPointedDice) >= desiredProbability;

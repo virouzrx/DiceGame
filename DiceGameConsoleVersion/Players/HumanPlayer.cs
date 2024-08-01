@@ -65,44 +65,13 @@ namespace DiceGameConsoleVersion.Logic
 
         public bool EndTurn(int roundScore, GameHistory history, int alreadyPointedDice)
         {
-            if (CurrentGamePhase == GamePhase.Entered)
+            Console.WriteLine("Your score is {0}. Do you wish to continue?", roundScore);
+            var response = Console.ReadLine();
+            if (response != "Y")
             {
-                if (roundScore < 30)
-                {
-                    Console.WriteLine("Your score is {0}", roundScore);
-                    return false;
-                }
-                Console.WriteLine("Your score is {0}. Do you wish to continue?", roundScore);
-                var response = Console.ReadLine();
-                if (response != "Y")
-                {
-                    return true;
-                }
-                return false;
+                return true;
             }
-            else
-            {
-                if (roundScore < 100)
-                {
-                    Console.WriteLine("Your score is {0}", roundScore);
-                    return false;
-                }
-                else
-                {
-                    if (CurrentGamePhase == GamePhase.Finishing)
-                    {
-                        CurrentGamePhase = GamePhase.Finished;
-                        return true;
-                    }
-                    Console.WriteLine("Your score is {0}. Do you wish to continue?", roundScore);
-                    var response = Console.ReadLine();
-                    if (response != "Y")
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            }
+            return false;
         }
     }
 }
