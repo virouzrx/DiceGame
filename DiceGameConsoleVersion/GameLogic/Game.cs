@@ -1,8 +1,4 @@
-﻿using DiceGame.Common.Enums;
-using DiceGame.Common.Players;
-using System.Reflection.Metadata.Ecma335;
-
-namespace DiceGame.Common.GameLogic
+﻿namespace DiceGame.Common.GameLogic
 {
     public class Game
     {
@@ -51,10 +47,6 @@ namespace DiceGame.Common.GameLogic
             while (!playerEndendTheirTurn)
             {
                 moveNumber++;
-                if (alreadyPointedDice >= 6)
-                {
-                    alreadyPointedDice = 0;
-                }
                 var playerThrow = _random.Throw(6 - alreadyPointedDice);
                 var diceToPoint = PointingSystem.FindDiceToPoint(playerThrow);
                 Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentGamePhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
@@ -76,33 +68,24 @@ namespace DiceGame.Common.GameLogic
                 }
 
                 ConsoleManagement.DisplayTheDiceThrown(diceToPoint);
-                var diceCount = diceToPoint.Sum(die => die.DiceCount);
-                if (diceCount == 6 || diceCount + alreadyPointedDice == 6)
+
+                var diceChose = player.ChooseDice(diceToPoint, alreadyPointedDice);
+                alreadyPointedDice += diceChose.Sum(x => x.DiceCount);
+                var tempscore = PointingSystem.CalculatePointsFromDice(diceChose);
+                playerScore += tempscore;
+                if ((playerScore >= 100 && player.CurrentGamePhase == GamePhase.Finishing) || playerScore + player.Score >= 1000)
                 {
-                    playerScore += PointingSystem.CalculatePointsFromDice(diceToPoint);
-                    Console.WriteLine("All dice were pointable. Current score = {0}", playerScore);
+                    return playerScore;
+                }
+                if (CheckIfPlayerCanFinishTheTurn(player.CurrentGamePhase, playerScore))
+                {
                     playerEndendTheirTurn = player.EndTurn(playerScore, GameHistory, alreadyPointedDice);
-                    alreadyPointedDice = 6;
                 }
                 else
                 {
-                    var diceChose = player.ChooseDice(diceToPoint, GameHistory, alreadyPointedDice);
-                    alreadyPointedDice += diceChose.Sum(x => x.DiceCount);
-                    var tempscore = PointingSystem.CalculatePointsFromDice(diceChose);
-                    playerScore += tempscore;
-                    if ((playerScore >= 100 && player.CurrentGamePhase == GamePhase.Finishing) || playerScore + player.Score >= 1000)
-                    {
-                        return playerScore;
-                    }
-                    if (CheckIfPlayerCanFinishTheTurn(player.CurrentGamePhase, playerScore))
-                    {
-                        playerEndendTheirTurn = player.EndTurn(playerScore, GameHistory, alreadyPointedDice);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"{player.Name}'s score is {playerScore}");
-                    }
+                    Console.WriteLine($"{player.Name}'s score is {playerScore}");
                 }
+
             }
             return playerScore;
         }

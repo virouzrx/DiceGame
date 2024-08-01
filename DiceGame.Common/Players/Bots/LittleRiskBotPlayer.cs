@@ -15,8 +15,13 @@ namespace DiceGame.Common.Players.Bots
             Name = name;
         }
 
-        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory gameHistory, int alreadyPointedDice)
+        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
+            if (diceToPoint.Sum(x => x.DiceCount) + alreadyPointedDice == 6)
+            {
+                return diceToPoint;
+            }
+
             if (diceToPoint.Count() == 1)
             {
                 var die = diceToPoint.First();

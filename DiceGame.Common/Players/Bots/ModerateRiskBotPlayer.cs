@@ -18,8 +18,13 @@ namespace DiceGame.Common.Players.Bots
             _probabilityHelper = helper;
         }
 
-        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory history, int alreadyPointedDice)
+        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
+            if (diceToPoint.Sum(x => x.DiceCount) + alreadyPointedDice == 6)
+            {
+                return diceToPoint;
+            }
+
             if (diceToPoint.Count() == 1)
             {
                 var die = diceToPoint.First();
@@ -127,7 +132,7 @@ namespace DiceGame.Common.Players.Bots
                         : new[] { new PointableDice(5, 1) };
         }
 
-        private static bool CanPlayerBeOvertakenOnEnteringTheGame(List<IPlayer> players, int score, int alreadyPointedDice)
+        private bool CanPlayerBeOvertakenOnEnteringTheGame(List<IPlayer> players, int score, int alreadyPointedDice)
         {
             var playersThatEnteredTheGame = players
                 .Where(x => x.CurrentGamePhase != GamePhase.NotEntered)
@@ -146,10 +151,7 @@ namespace DiceGame.Common.Players.Bots
             var playerRoundscore = Score + roundScore;
             if (index == 0)
             {
-                if (playerRoundscore - players[1].Score > 100)
-                {
-                    return true;
-                }
+                return playerRoundscore - players[1].Score > 100;
             }
 
             if (index != players.Count - 1 && //not last

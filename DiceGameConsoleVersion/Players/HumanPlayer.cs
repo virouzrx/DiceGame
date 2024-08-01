@@ -30,7 +30,7 @@ namespace DiceGameConsoleVersion.Logic
             return HashCode.Combine(Name, Score, CurrentGamePhase);
         }
 
-        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory gameHistory, int alreadyPointedDice)
+        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
             var incorrectInput = true;
             var selectedDice = new List<PointableDice>();

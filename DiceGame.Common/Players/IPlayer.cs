@@ -9,7 +9,7 @@ namespace DiceGame.Common.Players
         public int Score { get; set; }
         public GamePhase CurrentGamePhase { get; set; }
         public int MoveNumber { get; set; }
-        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory history, int alreadyPointedDice);
+        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice);
         public bool EndTurn(int roundScore, GameHistory history, int alreadyPointedDice);
     }
 }

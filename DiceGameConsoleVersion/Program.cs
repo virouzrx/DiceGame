@@ -11,18 +11,20 @@ namespace DiceGameConsoleVersion
             serviceCollection.AddScoped<PlayerFactory>();
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var probabilityHelper = serviceProvider.GetService<ProbabilityHelper>();
-            var playerFactory = new PlayerFactory(probabilityHelper!);
-            //todo: finish risky bot
-            //      implement guid to player class
-            //      move project to dotnet 8      
-            var players = new List<IPlayer>
+            var playerFactory = new PlayerFactory(probabilityHelper!);     
+            for (int i = 0; i < 1000; i++)
             {
-                playerFactory.CreatePlayer(PlayerType.Human, "Janek"),
-                playerFactory.CreatePlayer(PlayerType.Bot, "Czesiek", BotType.ModerateRisk),
-            };
+                var players = new List<IPlayer>
+                {
+                    playerFactory.CreatePlayer(PlayerType.Bot, "NoRisk", BotType.NoRisk),
+                    playerFactory.CreatePlayer(PlayerType.Bot, "LittleRisk", BotType.LittleRisk),
+                    playerFactory.CreatePlayer(PlayerType.Bot, "ModerateRisk", BotType.ModerateRisk),
+                    playerFactory.CreatePlayer(PlayerType.Bot, "Risky", BotType.Risky),
+                };
 
-            var game = new Game(players);
-            game.StartGame();
+                var game = new Game(players);
+                game.StartGame();
+            }
         }
     }
 }

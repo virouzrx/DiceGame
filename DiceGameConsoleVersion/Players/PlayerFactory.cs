@@ -28,7 +28,7 @@ namespace DiceGame.Common.Players
                 BotType.NoRisk => new NoRiskBotPlayer(name),
                 BotType.LittleRisk => new LittleRiskBotPlayer(name),
                 BotType.ModerateRisk => new ModerateRiskBotPlayer(name, _probabilityHelper),
-                BotType.Risky => new RiskyBotPlayer(name),
+                BotType.Risky => new RiskyBotPlayer(name, _probabilityHelper),
                 _ => throw new ArgumentException("Unknown bot type"),
             };
         }

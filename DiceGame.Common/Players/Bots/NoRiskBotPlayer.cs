@@ -15,7 +15,7 @@ namespace DiceGame.Common.Players.Bots
             Name = name;
         }
 
-        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, GameHistory gameHistory, int alreadyPointedDice)
+        public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
             return diceToPoint;
         }
