@@ -5,11 +5,13 @@
         public GameHistory GameHistory { get; set; }
         public List<IPlayer> Players { get; set; }
         private readonly Random _random;
-        public Game(List<IPlayer> players)
+        public int TaskId { get; set; }
+        public Game(List<IPlayer> players, int taskId)
         {
             Players = players;
             GameHistory = new GameHistory();
             _random = new Random();
+            TaskId = taskId;
         }
 
         public void StartGame()
@@ -19,7 +21,7 @@
                 GameHistory.History.Add(Players);
                 foreach (var player in Players)
                 {
-                    ConsoleManagement.DisplayLeaderboard(Players);
+                    //ConsoleManagement.DisplayLeaderboard(Players);
                     var score = PlayersTurn(player);
                     if (score != 0)
                     {
@@ -28,7 +30,7 @@
 
                     if (player.CurrentGamePhase == GamePhase.Finished)
                     {
-                        Console.WriteLine($"{player.Name} wins! Congratulations!");
+                        //Console.WriteLine($"{player.Name} wins! Congratulations!");
                         return;
                     }
                     GameHistory.UpdatePlayer(player);
@@ -49,25 +51,25 @@
                 moveNumber++;
                 var playerThrow = _random.Throw(6 - alreadyPointedDice);
                 var diceToPoint = PointingSystem.FindDiceToPoint(playerThrow);
-                Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentGamePhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
-                Console.WriteLine("------------------------");
+                //Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentGamePhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
+                //Console.WriteLine("------------------------");
                 if (!diceToPoint.Any())
                 {
                     if (alreadyPointedDice != 0)
                     {
-                        Console.WriteLine("No dice to point was thrown.\n");
+                        //Console.WriteLine("No dice to point was thrown.\n");
                         return 0;
                     }
                     if (player.CurrentGamePhase != GamePhase.NotEntered)
                     {
-                        Console.WriteLine("No dice to point was thrown by player. -50 points.");
+                        //Console.WriteLine("No dice to point was thrown by player. -50 points.");
                         return -50;
                     }
-                    Console.WriteLine("No dice to point was thrown by player.");
+                    //Console.WriteLine("No dice to point was thrown by player.");
                     return 0;
                 }
 
-                ConsoleManagement.DisplayTheDiceThrown(diceToPoint);
+                //ConsoleManagement.DisplayTheDiceThrown(diceToPoint);
 
                 var diceChose = player.ChooseDice(diceToPoint, alreadyPointedDice);
                 alreadyPointedDice += diceChose.Sum(x => x.DiceCount);
@@ -83,7 +85,7 @@
                 }
                 else
                 {
-                    Console.WriteLine($"{player.Name}'s score is {playerScore}");
+                    //Console.WriteLine($"{player.Name}'s score is {playerScore}");
                 }
 
             }

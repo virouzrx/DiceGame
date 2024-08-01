@@ -22,8 +22,9 @@ namespace DiceGameConsoleVersion
                     playerFactory.CreatePlayer(PlayerType.Bot, "Risky", BotType.Risky),
                 };
 
-                var game = new Game(players);
+                var game = new Game(players, 0);
                 game.StartGame();
+                var x = 0;
             }
         }
     }

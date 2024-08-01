@@ -6,7 +6,7 @@
 
         public static double SimulateDiceRolls(int diceAmount, int desiredScore)
         {
-            var totalSimulations = 1000000;
+            var totalSimulations = 100000;
             var totalSuccesses = 0;
             var totalFailures = 0;
 
