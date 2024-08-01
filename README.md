@@ -1,8 +1,8 @@
 # Dice game project
 
->> The degree of complexity increases with the amount of time spent on the project.
+> The degree of complexity increases with the amount of time spent on the project.
 
-> ~Me, and probably many others as well
+~Me, and probably many others as well
 
 This project is an attempt to recreate a dice game known as Farkle or 10000. The goal is to create a fully functional game, with different kind of bots and simulations, fully tested and accessible through web.
 
@@ -86,7 +86,15 @@ If the player reaches 1000 points, the game ends.
 # Project state 
 
 1. ~~Create functional game~~
-2. Create bots with different rules and different risk management 
+2. Create bots with different rules and different risk management
+    1. Create rules for bots that simulate real person's approach
+        1. ~~No risk approach~~
+        2. ~~Little risk approach~~
+        3. Moderate risk approach 
+        4. Risky approach
+    2. Implement method allowing calculating probability of throwing a particular score 
+       1. ~~Implement Monte Carlo approach~~
 3. Create simulations to determine which strategy is the best
-4. Move the game from console version to web version.
+4. Move the game from console version to web version
+5. Implement Redis for storing game state
 
