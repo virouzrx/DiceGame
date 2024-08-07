@@ -1,19 +1,11 @@
-﻿using DiceGame.Common.Enums;
-using DiceGame.Common.GameLogic;
+﻿using DiceGame.Common.Extensions;
 
 namespace DiceGame.Common.Players.Bots
 {
-    public class LittleRiskBotPlayer : IPlayer
+    public class LittleRiskBotPlayer(string name) : IPlayer
     {
-        public string? Name { get; init; }
-        public int Score { get; set; }
-        public GamePhase CurrentGamePhase { get; set; }
-        public int MoveNumber { get; set; }
-
-        public LittleRiskBotPlayer(string name)
-        {
-            Name = name;
-        }
+        public string Name { get; init; } = name;
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
@@ -35,7 +27,7 @@ namespace DiceGame.Common.Players.Bots
                 {
                     return diceToPoint;
                 }
-                return new[] { new PointableDice(die.Score, 1) };
+                return [new PointableDice(die.Score, 1)];
             }
 
             if (alreadyPointedDice < 2)
@@ -46,55 +38,56 @@ namespace DiceGame.Common.Players.Bots
                     {
                         if (diceToPoint.Any(x => x.Score == 1))
                         {
-                            return new[] { new PointableDice(1, 1) };
+                            return [new PointableDice(1, 1)];
                         }
-                        return new[] { new PointableDice(5, 1) };
+                        return [new PointableDice(5, 1)];
                     }
                     return diceToPoint;
                 }
 
                 if (!diceToPoint.Any(x => x.Score == 1))
                 {
-                    return new[] { new PointableDice(5, 1) };
+                    return [new PointableDice(5, 1)];
                 }
-                return new[] { new PointableDice(1, 1) };
+                return [new PointableDice(1, 1)];
             }
             return diceToPoint;
         }
 
-        public bool EndTurn(int roundScore, GameHistory gameHistory, int alreadyPointedDice)
+        public bool EndTurn(int roundScore, GameStateOverview gameStateOverview, int alreadyPointedDice)
         {
-            if (CurrentGamePhase == GamePhase.Entered)
+            var playerInfo = gameStateOverview.Leaderboard!.First(x => x.Id == Id);
+            if (playerInfo.CurrentGamePhase == GamePhase.Entered)
             {
-                if (!gameHistory.PlayerScoredInLastRounds(Name!, 2))
+                if (!gameStateOverview.PlayerScoredInLastRounds())
                 {
                     return true;
                 }
 
-                if (gameHistory.IsPlayerLast(Name!))
+                if (gameStateOverview.IsPlayerLast())
                 {
                     return true;
                 }
             }
-            return !ShouldRisk(gameHistory.GetLastHistoryItem());
+            return !ShouldRisk(gameStateOverview.Leaderboard, playerInfo);
         }
 
-        private bool ShouldRisk(List<IPlayer> players)
+        private bool ShouldRisk(IReadOnlyList<PlayerInfo> players, PlayerInfo playerInfo)
         {
-            var index = players.FindIndex(x => x.Name == Name);
+            var index = players.IndexOf(playerInfo);
             if (index == 0)
             {
-                return Score - players[1].Score > 200;
+                return playerInfo.Score - players[1].Score > 200;
             }
 
-            return ArePlayersWithinScoreRange(players, index);
+            return ArePlayersWithinScoreRange(players, playerInfo, index);
         }
 
-        private bool ArePlayersWithinScoreRange(List<IPlayer> players, int index)
+        private bool ArePlayersWithinScoreRange(IReadOnlyList<PlayerInfo> players, PlayerInfo playerInfo, int index)
         {
             return index != players.Count - 1
-                && players[index - 1].Score - Score <= 45
-                && Score - players[index + 1].Score > 75;
+                && players[index - 1].Score - playerInfo.Score <= 45
+                && playerInfo.Score - players[index + 1].Score > 75;
         }
     }
 }

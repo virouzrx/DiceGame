@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using DiceGame.Common.Extensions;
 
 namespace DiceGameConsoleVersion
 {
@@ -7,25 +8,17 @@ namespace DiceGameConsoleVersion
         public static void Main()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddScoped<ProbabilityHelper>();
-            serviceCollection.AddScoped<PlayerFactory>();
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            var probabilityHelper = serviceProvider.GetService<ProbabilityHelper>();
-            var playerFactory = new PlayerFactory(probabilityHelper!);     
-            for (int i = 0; i < 1000; i++)
-            {
-                var players = new List<IPlayer>
-                {
-                    playerFactory.CreatePlayer(PlayerType.Bot, "NoRisk", BotType.NoRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "LittleRisk", BotType.LittleRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "ModerateRisk", BotType.ModerateRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "Risky", BotType.Risky),
-                };
+            serviceCollection.RegisterServicesNecessaryForGame();
 
-                var game = new Game(players, 0);
-                game.StartGame();
-                var x = 0;
-            }
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            var probabilityHelper = serviceProvider.GetService<ProbabilityHelper>();
+            var playerFactory = serviceProvider.GetService<PlayerFactory>()!;
+            var gameHistory = serviceProvider.GetService<GameHistory>()!;
+            var gameState = serviceProvider.GetService<GameState>()!;
+            var players = serviceProvider.GetService<IEnumerable<IPlayer>>()!.ToList();
+            var game = new Game(players, gameState);
+            game.StartGame();
         }
     }
 }

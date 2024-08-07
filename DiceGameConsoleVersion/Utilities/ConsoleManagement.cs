@@ -22,7 +22,7 @@ namespace DiceGameConsoleVersion.Utilities
             }
         }
 
-        public static void DisplayLeaderboard(List<IPlayer> players)
+        public static void DisplayLeaderboard(List<PlayerInfo> players)
         {
             Console.WriteLine("------------------------");
             foreach (var player in players.OrderByDescending(x => x.Score))

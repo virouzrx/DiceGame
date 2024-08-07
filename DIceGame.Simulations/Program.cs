@@ -2,16 +2,21 @@
 using DiceGame.Common.GameLogic;
 using DiceGame.Common.GameLogic.ProbabilityHelpers;
 using DiceGame.Common.Players;
+using DiceGame.Common.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
 var serviceCollection = new ServiceCollection();
-serviceCollection.AddScoped<ProbabilityHelper>();
-serviceCollection.AddScoped<PlayerFactory>();
+serviceCollection.RegisterServicesNecessaryForGame();
+
 var serviceProvider = serviceCollection.BuildServiceProvider();
+
 var probabilityHelper = serviceProvider.GetService<ProbabilityHelper>();
-var playerFactory = new PlayerFactory(probabilityHelper!);
+var playerFactory = serviceProvider.GetService<PlayerFactory>()!;
+var gameHistory = serviceProvider.GetService<GameHistory>()!;
+var gameState = serviceProvider.GetService<GameState>()!;
+var players = serviceProvider.GetService<IEnumerable<IPlayer>>()!.ToList();
 var table = new ConcurrentDictionary<string, int>
 {
     ["Risky"] = 0,
@@ -19,24 +24,17 @@ var table = new ConcurrentDictionary<string, int>
     ["ModerateRisk"] = 0,
     ["LittleRisk"] = 0,
 };
-for (int i = 0; i < 100; i++)
+for (int i = 0; i < 10; i++)
 {
     var tasks = new List<Task>();
-    for (int j = 0; j < 100; j++)
+    for (int j = 0; j < 10; j++)
     {
         tasks.Add(Task.Run(() =>
         {
-            var players = new List<IPlayer>
-                {
-                    playerFactory.CreatePlayer(PlayerType.Bot, "NoRisk", BotType.NoRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "LittleRisk", BotType.LittleRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "ModerateRisk", BotType.ModerateRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "Risky", BotType.Risky),
-                };
-            var game = new Game(players, j);
+            var game = new Game(players, gameState, gameHistory);
             game.StartGame();
 
-            var finishedPlayer = players.FirstOrDefault(x => x.CurrentGamePhase == GamePhase.Finished);
+            var finishedPlayer = gameState.Leaderboard.FirstOrDefault(x => x.CurrentGamePhase == GamePhase.Finished);
             if (finishedPlayer != null)
             {
                 table.AddOrUpdate(finishedPlayer.Name!, 1, (key, oldValue) => oldValue + 1);

@@ -2,21 +2,16 @@
 
 namespace DiceGame.Common.Players
 {
-    public class PlayerFactory
+    public class PlayerFactory(ProbabilityHelper probabilityHelper)
     {
-        private readonly ProbabilityHelper _probabilityHelper;
-
-        public PlayerFactory(ProbabilityHelper probabilityHelper)
-        {
-            _probabilityHelper = probabilityHelper;
-        }
+        private readonly ProbabilityHelper _probabilityHelper = probabilityHelper;
 
         public IPlayer CreatePlayer(PlayerType playerType, string name, BotType? botType = null)
         {
-            if (playerType == PlayerType.Human)
-            {
-                return new HumanPlayer(name);
-            }
+            //if (playerType == PlayerType.Human)
+            //{
+            //    return new HumanPlayer(name);
+            //}
 
             if (botType == null)
             {

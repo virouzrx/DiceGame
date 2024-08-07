@@ -1,4 +1,6 @@
-﻿namespace DiceGame.Common.GameLogic.ProbabilityHelpers
+﻿using DiceGame.Common.Extensions;
+
+namespace DiceGame.Common.GameLogic.ProbabilityHelpers
 {
     public class MonteCarloGenerationHelper
     {
