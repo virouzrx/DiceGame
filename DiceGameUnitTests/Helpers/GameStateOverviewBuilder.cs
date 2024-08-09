@@ -32,13 +32,15 @@ namespace DiceGame.UnitTests.Helpers
 
         public GameStateOverview Build()
         {
-            var players = _playerData
-                .Select(item => new NoRiskBotPlayer(item.Name))
-                .ToList();
+            var players = new List<IPlayer>();
+            foreach (var item in _playerData)
+            {
+                players.Add(new NoRiskBotPlayer(item.Name));
+            }
 
             if (_testPlayer != null)
             {
-                players.Add(new NoRiskBotPlayer(_testPlayer.Name));
+                players.Add(_testPlayer);
             }
 
             var gameState = new GameState(players);
@@ -52,11 +54,18 @@ namespace DiceGame.UnitTests.Helpers
                     playerInfo.CurrentGamePhase = item.GamePhase;
                 }
             }
-
+            if (_testPlayersHistoryOfThrows is not null)
+            {
+                foreach (var historyThrow in _testPlayersHistoryOfThrows!)
+                {
+                    gameState.History.Add((_testPlayer!.Id, historyThrow));
+                }
+            }
             gameState.Leaderboard.First(x => x.Id == _testPlayer!.Id).CurrentGamePhase = _testPlayersGamePhase;
             gameState.Leaderboard.First(x => x.Id == _testPlayer!.Id).Score = _testPlayersScore;
+            gameState.Leaderboard = [.. gameState.Leaderboard.OrderByDescending(x => x.Score)];
 
-            return new GameStateOverview(gameState, _playerId);
+            return new GameStateOverview(gameState, _testPlayer!.Id);
         }
     }
 }

@@ -59,7 +59,7 @@ namespace DiceGame.Common.Players.Bots
             var playerInfo = gameStateOverview.Leaderboard!.First(x => x.Id == Id);
             if (playerInfo.CurrentGamePhase == GamePhase.Entered)
             {
-                if (!gameStateOverview.PlayerScoredInLastRounds())
+                if (!gameStateOverview.PlayerScoredInLastRounds(2))
                 {
                     return true;
                 }

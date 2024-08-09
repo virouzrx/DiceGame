@@ -31,7 +31,7 @@ for (int i = 0; i < 10; i++)
     {
         tasks.Add(Task.Run(() =>
         {
-            var game = new Game(players, gameState, gameHistory);
+            var game = new Game(players, gameState);
             game.StartGame();
 
             var finishedPlayer = gameState.Leaderboard.FirstOrDefault(x => x.CurrentGamePhase == GamePhase.Finished);
