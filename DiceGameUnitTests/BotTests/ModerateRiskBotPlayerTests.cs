@@ -11,10 +11,11 @@ namespace DiceGame.UnitTests.BotTests
         {
             var bot = new ModerateRiskBotPlayer("Bot", ProbabilityHelper);
             var gameStateOverview = new GameStateOverviewBuilder()
-                .WithPlayer("Player1", GamePhase.NotEntered, 120)
-                .WithPlayer("Player2", GamePhase.Entered, 130)
-                .WithPlayer("Player3", GamePhase.Entered, 160)
-                .WithPlayerToTest(bot, GamePhase.NotEntered, 0)
+                .WithPlayer("Player1", GamePhase.NotEntered, 300)
+                .WithPlayer("Player2", GamePhase.Entered, 350)
+                .WithPlayer("Player3", GamePhase.Entered, 400)
+                .WithPlayerToTest(bot, GamePhase.Entered, 500)
+                .WithPlayerHistory([500, 500, 500])
                 .Build();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 3);
@@ -47,7 +48,7 @@ namespace DiceGame.UnitTests.BotTests
                 .WithPlayerToTest(bot, GamePhase.NotEntered, 0)
                 .Build();
 
-            var turnEnded = bot.EndTurn(110, gameStateOverview, 5);
+            var turnEnded = bot.EndTurn(120, gameStateOverview, 5);
             Assert.True(turnEnded);
         }
 
