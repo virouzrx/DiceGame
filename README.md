@@ -87,14 +87,14 @@ If the player reaches 1000 points, the game ends.
 
 1. ~~Create functional game~~
 2. Create bots with different rules and different risk management
-    1. Create rules for bots that simulate real person's approach
+    1. ~~Create rules for bots that simulate real person's approach~~
         1. ~~No risk approach~~
         2. ~~Little risk approach~~
-        3. Moderate risk approach 
-        4. Risky approach
-    2. Implement method allowing calculating probability of throwing a particular score 
+        3. ~~Moderate risk approach~~
+        4. ~~Risky approach~~
+    2. ~~Implement method allowing calculating probability of throwing a particular score~~
        1. ~~Implement Monte Carlo approach~~
-3. Create simulations to determine which strategy is the best
+3. ~~Create simulations to determine which strategy is the best~~
 4. Move the game from console version to web version
 5. Implement Redis for storing game state
 
