@@ -1,8 +1,4 @@
-﻿using DiceGame.Common.Enums;
-using DiceGame.Common.GameLogic;
-using DiceGame.Common.Players;
-
-namespace DiceGameConsoleVersion.Logic
+﻿namespace DiceGameConsoleVersion.Logic
 {
     public class HumanPlayer(string name) : IPlayer
     {

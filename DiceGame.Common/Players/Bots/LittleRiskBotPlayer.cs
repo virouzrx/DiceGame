@@ -72,7 +72,7 @@ namespace DiceGame.Common.Players.Bots
             return !ShouldRisk(gameStateOverview.Leaderboard, playerInfo);
         }
 
-        private bool ShouldRisk(IReadOnlyList<PlayerInfo> players, PlayerInfo playerInfo)
+        private static bool ShouldRisk(IReadOnlyList<PlayerInfo> players, PlayerInfo playerInfo)
         {
             var index = players.IndexOf(playerInfo);
             if (index == 0)
@@ -83,7 +83,7 @@ namespace DiceGame.Common.Players.Bots
             return ArePlayersWithinScoreRange(players, playerInfo, index);
         }
 
-        private bool ArePlayersWithinScoreRange(IReadOnlyList<PlayerInfo> players, PlayerInfo playerInfo, int index)
+        private static bool ArePlayersWithinScoreRange(IReadOnlyList<PlayerInfo> players, PlayerInfo playerInfo, int index)
         {
             return index != players.Count - 1
                 && players[index - 1].Score - playerInfo.Score <= 45

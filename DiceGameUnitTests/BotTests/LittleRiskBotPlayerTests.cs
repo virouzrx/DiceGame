@@ -30,13 +30,13 @@ namespace DiceGame.UnitTests.BotTests
         public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotHasntScoredInLast2Rounds()
         {
             var bot = new LittleRiskBotPlayer("Bot");
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.Entered, 180)
                 .WithPlayer("Player2", GamePhase.Entered, 200)
                 .WithPlayer("Player3", GamePhase.Entered, 240)
                 .WithPlayerToTest(bot, GamePhase.Entered, 280)
                 .WithPlayerHistory([100, 100, 100])
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 0);
             Assert.True(turnEnded);
@@ -46,13 +46,13 @@ namespace DiceGame.UnitTests.BotTests
         public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotIsLast()
         {
             var bot = new LittleRiskBotPlayer("Bot");
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.Entered, 350)
                 .WithPlayer("Player2", GamePhase.Entered, 400)
                 .WithPlayer("Player3", GamePhase.Entered, 600)
                 .WithPlayerToTest(bot, GamePhase.Entered, 280)
                 .WithPlayerHistory([150, 230, 280])
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 0);
             Assert.True(turnEnded);
@@ -62,13 +62,13 @@ namespace DiceGame.UnitTests.BotTests
         public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotIsFirstWithoutBigAdvantage()
         {
             var bot = new LittleRiskBotPlayer("Bot");
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.Entered, 350)
                 .WithPlayer("Player2", GamePhase.Entered, 400)
                 .WithPlayer("Player3", GamePhase.Entered, 600)
                 .WithPlayerToTest(bot, GamePhase.Entered, 780)
                 .WithPlayerHistory([660, 700, 750])
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 0);
             Assert.True(turnEnded);
@@ -78,13 +78,13 @@ namespace DiceGame.UnitTests.BotTests
         public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotIsFirstWithBigAdvantage()
         {
             var bot = new LittleRiskBotPlayer("Bot");
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.Entered, 350)
                 .WithPlayer("Player2", GamePhase.Entered, 400)
                 .WithPlayer("Player3", GamePhase.Entered, 600)
                 .WithPlayerToTest(bot, GamePhase.Entered, 810)
                 .WithPlayerHistory([670, 700, 750])
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 0);
             Assert.False(turnEnded);
@@ -94,12 +94,12 @@ namespace DiceGame.UnitTests.BotTests
         public void LittleRiskBot_CheckIfBotEndsTurn_WhenBotHasntEnteredTheGame()
         {
             var bot = new LittleRiskBotPlayer("Bot");
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.NotEntered, 0)
                 .WithPlayer("Player3", GamePhase.NotEntered, 0)
                 .WithPlayerToTest(bot, GamePhase.Entered, 100)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(100, gameStateOverview, 0);
             Assert.True(turnEnded);

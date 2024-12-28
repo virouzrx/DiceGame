@@ -10,13 +10,13 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotEndsTurn_WhenBotHasntScoredInLast3Rounds()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.Entered, 200)
                 .WithPlayer("Player2", GamePhase.Entered, 500)
                 .WithPlayer("Player3", GamePhase.Entered, 600)
                 .WithPlayerToTest(bot, GamePhase.Entered, 300)
                 .WithPlayerHistory([300, 300, 300])
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 5);
             Assert.True(turnEnded);
@@ -26,12 +26,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotEndsTurn_WhenNoOneEnteredTheGame_WithInsufficientScore_AndLowProbability()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.NotEntered, 0)
                 .WithPlayer("Player3", GamePhase.NotEntered, 0)
                 .WithPlayerToTest(bot, GamePhase.NotEntered, 0)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(110, gameStateOverview, 5);
             Assert.True(turnEnded);
@@ -41,12 +41,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotEndsTurn_WhenNoOneEnteredTheGame_WithSufficientScore_AndLowProbability()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.NotEntered, 0)
                 .WithPlayer("Player3", GamePhase.NotEntered, 0)
                 .WithPlayerToTest(bot, GamePhase.NotEntered, 0)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(120, gameStateOverview, 5);
             Assert.True(turnEnded);
@@ -56,12 +56,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotEndsTurn_WhenNoOneEnteredTheGame_WithInsufficientScore_AndHighProbability()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.NotEntered, 0)
                 .WithPlayer("Player3", GamePhase.NotEntered, 0)
                 .WithPlayerToTest(bot, GamePhase.NotEntered, 0)
-                .Build();
+                .BuildGameStateOverview();
 
 
             var turnEnded = bot.EndTurn(110, gameStateOverview, 2);
@@ -72,12 +72,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotEndsTurn_WhenBotThrows100_AndRestOfThePlayersEnteredTheGame()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.Entered, 120)
                 .WithPlayer("Player2", GamePhase.Entered, 130)
                 .WithPlayer("Player3", GamePhase.Entered, 160)
                 .WithPlayerToTest(bot, GamePhase.NotEntered, 0)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(100, gameStateOverview, 1);
             Assert.True(turnEnded);
@@ -87,12 +87,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotContinues_WhenBotCanOvertakePlayerOnEntering()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.Entered, 110)
                 .WithPlayer("Player3", GamePhase.Entered, 300)
                 .WithPlayerToTest(bot, GamePhase.NotEntered, 0)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(100, gameStateOverview, 1);
             Assert.False(turnEnded);
@@ -102,12 +102,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotEndsTurn_WhenBotCanHaveScoreJustBelow900()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.Entered, 110)
                 .WithPlayer("Player3", GamePhase.Entered, 300)
                 .WithPlayerToTest(bot, GamePhase.Entered, 860)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(35, gameStateOverview, 1);
             Assert.True(turnEnded);
@@ -117,12 +117,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotContinues_WhenBotHasScoreBetween900And940()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.Entered, 130)
                 .WithPlayer("Player3", GamePhase.Entered, 160)
                 .WithPlayerToTest(bot, GamePhase.Entered, 880)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 1);
             Assert.False(turnEnded);
@@ -132,12 +132,12 @@ namespace DiceGame.UnitTests.BotTests
         public void RiskyBot_CheckIfBotContinues_WhenOtherPlayersHave75OrLessPointsAdvantage_AndPlayerBelowIsBehind100Points()
         {
             var bot = new RiskyBotPlayer("Bot", ProbabilityHelper);
-            var gameStateOverview = new GameStateOverviewBuilder()
+            var gameStateOverview = new GameStateBuilder()
                 .WithPlayer("Player1", GamePhase.NotEntered, 0)
                 .WithPlayer("Player2", GamePhase.Entered, 110)
                 .WithPlayer("Player3", GamePhase.Entered, 400)
                 .WithPlayerToTest(bot, GamePhase.Entered, 330)
-                .Build();
+                .BuildGameStateOverview();
 
             var turnEnded = bot.EndTurn(30, gameStateOverview, 1);
             Assert.False(turnEnded);

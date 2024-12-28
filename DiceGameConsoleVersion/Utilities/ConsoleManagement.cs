@@ -22,8 +22,19 @@ namespace DiceGameConsoleVersion.Utilities
             }
         }
 
-        public static void DisplayLeaderboard(List<PlayerInfo> players)
+        public static void DisplayCurrentPlayerInfo(bool useConsole, string name, GamePhase gamePhase, int moveNumber, IEnumerable<int> playerThrow)
         {
+            if (!useConsole)
+                return;
+            Console.WriteLine($"Player: {name}, Phase: {gamePhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
+            Console.WriteLine("------------------------");
+        }
+
+        public static void DisplayLeaderboard(bool useConsole, List<PlayerInfo> players)
+        {
+            if (!useConsole)
+                return;
+
             Console.WriteLine("------------------------");
             foreach (var player in players.OrderByDescending(x => x.Score))
             {
@@ -32,8 +43,10 @@ namespace DiceGameConsoleVersion.Utilities
             Console.WriteLine("------------------------");
         }
 
-        public static void DisplayTheDiceThrown(IEnumerable<PointableDice> dice)
+        public static void DisplayTheDiceThrown(bool useConsole, IEnumerable<PointableDice> dice)
         {
+            if (!useConsole)
+                return;
             foreach (var die in dice)
             {
                 if (die.DiceCount < 2)
@@ -45,6 +58,34 @@ namespace DiceGameConsoleVersion.Utilities
                     Console.WriteLine($"{string.Join(", ", Enumerable.Repeat(die.Score.ToString(), die.DiceCount))}");
                 }
             }
+        }
+
+        public static void DisplayNoDiceToPointMessage(bool useConsole)
+        {
+            if (!useConsole)
+                return;
+            Console.WriteLine("No dice to point was thrown.\n");
+        }
+
+        public static void DisplayNoDiceToPointWithMinusPointsMessage(bool useConsole)
+        {
+            if (!useConsole)
+                return;
+            Console.WriteLine("No dice to point was thrown by player. -50 points.");
+        }
+
+        public static void DisplayNoDiceToPointAtAllMessage(bool useConsole)
+        {
+            if (!useConsole)
+                return;
+            Console.WriteLine("No dice to point was thrown in first throw.");
+        }
+
+        public static void DisplayPlayerScore(bool useConsole, string playerName, int playerScore)
+        {
+            if (!useConsole)
+                return;
+            Console.WriteLine($"{playerName}'s score is {playerScore}");
         }
     }
 }

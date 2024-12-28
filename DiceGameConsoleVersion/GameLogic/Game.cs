@@ -1,11 +1,15 @@
 ﻿using DiceGame.Common.Extensions;
+using DiceGame.ConsoleVersion.Utilities;
+using Microsoft.Extensions.Hosting;
 
 namespace DiceGame.Common.GameLogic
 {
-    public class Game(List<IPlayer> players, GameState gameState)
+    public class Game(IEnumerable<IPlayer> players, GameState gameState, GameResultsCollector resultCollector, ConsoleSettings consoleSettings) : IHostedService
     {
         public GameState GameState { get; set; } = gameState;
-        public List<IPlayer> Players { get; set; } = players;
+        private readonly GameResultsCollector _resultCollector = resultCollector;
+        private readonly ConsoleSettings _consoleSettings = consoleSettings;
+        public IEnumerable<IPlayer> Players { get; set; } = players;
         private readonly Random _random = new();
 
         public void StartGame()
@@ -15,7 +19,7 @@ namespace DiceGame.Common.GameLogic
                 foreach (var player in Players)
                 {
                     var playerState = GameState.Leaderboard.First(x => x.Id == player.Id);
-                    ConsoleManagement.DisplayLeaderboard(GameState.Leaderboard);
+                    ConsoleManagement.DisplayLeaderboard(_consoleSettings.UseConsole, GameState.Leaderboard);
                     var score = PlayersTurn(player, playerState);
                     if (score != 0)
                     {
@@ -25,6 +29,7 @@ namespace DiceGame.Common.GameLogic
                     if (playerState.CurrentGamePhase == GamePhase.Finished)
                     {
                         Console.WriteLine($"{player.Name} wins! Congratulations!");
+                        _resultCollector.AddWinner(player.Name);
                         return;
                     }
                     playerState.MoveNumber++;
@@ -45,25 +50,24 @@ namespace DiceGame.Common.GameLogic
                 moveNumber++;
                 var playerThrow = _random.Throw(6 - alreadyPointedDice);
                 var diceToPoint = PointingSystem.FindDiceToPoint(playerThrow);
-                Console.WriteLine($"Player: {player.Name}, Phase: {playerInfo.CurrentGamePhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
-                Console.WriteLine("------------------------");
+                ConsoleManagement.DisplayCurrentPlayerInfo(_consoleSettings.UseConsole, player.Name, playerInfo.CurrentGamePhase, moveNumber, playerThrow);
                 if (!diceToPoint.Any())
                 {
                     if (alreadyPointedDice != 0)
                     {
-                        Console.WriteLine("No dice to point was thrown.\n");
+                        ConsoleManagement.DisplayNoDiceToPointMessage(_consoleSettings.UseConsole);
                         return 0;
                     }
                     if (playerInfo.CurrentGamePhase != GamePhase.NotEntered)
                     {
-                        Console.WriteLine("No dice to point was thrown by player. -50 points.");
+                        ConsoleManagement.DisplayNoDiceToPointWithMinusPointsMessage(_consoleSettings.UseConsole);
                         return -50;
                     }
-                    Console.WriteLine("No dice to point was thrown by player.");
+                    ConsoleManagement.DisplayNoDiceToPointAtAllMessage(_consoleSettings.UseConsole);
                     return 0;
                 }
 
-                ConsoleManagement.DisplayTheDiceThrown(diceToPoint);
+                ConsoleManagement.DisplayTheDiceThrown(_consoleSettings.UseConsole, diceToPoint);
 
                 var diceChose = player.ChooseDice(diceToPoint, alreadyPointedDice);
                 alreadyPointedDice += diceChose.Sum(x => x.DiceCount);
@@ -80,7 +84,7 @@ namespace DiceGame.Common.GameLogic
                 }
                 else
                 {
-                    Console.WriteLine($"{player.Name}'s score is {playerScore}");
+                    ConsoleManagement.DisplayPlayerScore(_consoleSettings.UseConsole, player.Name, playerScore);
                 }
 
             }
@@ -95,6 +99,17 @@ namespace DiceGame.Common.GameLogic
                 GamePhase.Entered => score >= 30,
                 _ => throw new ArgumentException("Player with wrong gamephase was present in the game"),
             };
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            StartGame();
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

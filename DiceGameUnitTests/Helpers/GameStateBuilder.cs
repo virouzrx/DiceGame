@@ -2,7 +2,7 @@
 
 namespace DiceGame.UnitTests.Helpers
 {
-    public class GameStateOverviewBuilder
+    public class GameStateBuilder
     {
         private readonly List<(string Name, GamePhase GamePhase, int Score)> _playerData = [];
         private IPlayer? _testPlayer;
@@ -10,13 +10,13 @@ namespace DiceGame.UnitTests.Helpers
         private GamePhase _testPlayersGamePhase;
         private IEnumerable<int>? _testPlayersHistoryOfThrows;
 
-        public GameStateOverviewBuilder WithPlayer(string name, GamePhase gamePhase, int score)
+        public GameStateBuilder WithPlayer(string name, GamePhase gamePhase, int score)
         {
             _playerData.Add((name, gamePhase, score));
             return this;
         }
 
-        public GameStateOverviewBuilder WithPlayerToTest(IPlayer player, GamePhase gamePhase, int score)
+        public GameStateBuilder WithPlayerToTest(IPlayer player, GamePhase gamePhase, int score)
         {
             _testPlayer = player;
             _testPlayersScore = score;
@@ -24,13 +24,13 @@ namespace DiceGame.UnitTests.Helpers
             return this;
         }
 
-        public GameStateOverviewBuilder WithPlayerHistory(IEnumerable<int> scores)
+        public GameStateBuilder WithPlayerHistory(IEnumerable<int> scores)
         {
             _testPlayersHistoryOfThrows = scores;
             return this;
         }
 
-        public GameStateOverview Build()
+        public GameState BuildGameState()
         {
             var players = new List<IPlayer>();
             foreach (var item in _playerData)
@@ -65,6 +65,12 @@ namespace DiceGame.UnitTests.Helpers
             gameState.Leaderboard.First(x => x.Id == _testPlayer!.Id).Score = _testPlayersScore;
             gameState.Leaderboard = [.. gameState.Leaderboard.OrderByDescending(x => x.Score)];
 
+            return gameState;
+        }
+
+        public GameStateOverview BuildGameStateOverview()
+        {
+            var gameState = BuildGameState();
             return new GameStateOverview(gameState, _testPlayer!.Id);
         }
     }

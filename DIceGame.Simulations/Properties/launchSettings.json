@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DIceGame.Simulations": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "GAME_MODE": "sim"
+      }
+    }
+  }
+}

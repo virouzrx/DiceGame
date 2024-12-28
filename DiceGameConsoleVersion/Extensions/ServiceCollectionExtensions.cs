@@ -1,13 +1,31 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DiceGame.ConsoleVersion.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace DiceGame.Common.Extensions
+namespace DiceGame.ConsoleVersion.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void RegisterServicesNecessaryForGame(this IServiceCollection serviceCollection)
+        public static void RegisterServicesNecessaryForGame(this IServiceCollection serviceCollection, bool useConsole = true)
         {
             serviceCollection.AddScoped<ProbabilityHelper>();
             serviceCollection.AddScoped<PlayerFactory>();
+            if (useConsole)
+            {
+                var consoleSetting = new ConsoleSettings
+                {
+                    UseConsole = useConsole
+                };
+                serviceCollection.AddSingleton(consoleSetting);
+            }
+            else
+            {
+                serviceCollection.AddSingleton<ConsoleSettings>();
+            }
+
+            if (!serviceCollection.Any(sd => sd.ServiceType == typeof(GameResultsCollector)))
+            {
+                serviceCollection.AddSingleton<GameResultsCollector>();
+            }
             serviceCollection.AddSingleton<IEnumerable<IPlayer>>(provider =>
             {
                 var playerFactory = provider.GetRequiredService<PlayerFactory>()!;
@@ -27,6 +45,5 @@ namespace DiceGame.Common.Extensions
             });
             serviceCollection.AddScoped<GameHistory>();
         }
-
     }
 }

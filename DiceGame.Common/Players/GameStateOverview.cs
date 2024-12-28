@@ -6,7 +6,7 @@
         public IReadOnlyList<int> LastPlayersMoves { get; init; }
         public GameStateOverview(GameState state, Guid id)
         {
-            Leaderboard = [.. state.Leaderboard.OrderByDescending(x => x.Score)];
+            Leaderboard = state.Leaderboard;
             LastPlayersMoves = state.History
                 .Where(x => x.Id == id)
                 .TakeLast(3)
@@ -25,8 +25,6 @@
 
         public bool PlayerScoredInLastRounds(int roundsToCheck)
         {
-            var takeLast = LastPlayersMoves.TakeLast(roundsToCheck);
-            var distinct = takeLast.Distinct();
             return LastPlayersMoves
                 .TakeLast(roundsToCheck)
                 .Distinct()
