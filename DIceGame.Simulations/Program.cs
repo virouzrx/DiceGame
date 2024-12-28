@@ -16,9 +16,9 @@ Stopwatch stopwatch = new();
 stopwatch.Start();
 
 var tasks = new List<Task>();
-for (int i = 0; i < 10; i++)
+for (int i = 0; i < 100; i++)
 {
-    for (int j = 0; j < 10; j++)
+    for (int j = 0; j < 100; j++)
     {
         tasks.Add(Task.Run(async () =>
         {
