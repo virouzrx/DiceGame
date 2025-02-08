@@ -4,7 +4,11 @@ using Microsoft.Extensions.Hosting;
 
 namespace DiceGame.Common.GameLogic
 {
-    public class Game(IEnumerable<IPlayer> players, GameState gameState, GameResultsCollector resultCollector, ConsoleSettings consoleSettings) : IHostedService
+    public class Game(
+        IEnumerable<IPlayer> players, 
+        GameState gameState, 
+        GameResultsCollector resultCollector, 
+        ConsoleSettings consoleSettings) : IHostedService
     {
         public GameState GameState { get; set; } = gameState;
         private readonly GameResultsCollector _resultCollector = resultCollector;
@@ -28,8 +32,7 @@ namespace DiceGame.Common.GameLogic
 
                     if (playerState.CurrentGamePhase == GamePhase.Finished)
                     {
-                        Console.WriteLine($"{player.Name} wins! Congratulations!");
-                        _resultCollector.AddWinner(player.Name);
+                        _resultCollector.AddWinner(player.BotType);
                         return;
                     }
                     playerState.MoveNumber++;

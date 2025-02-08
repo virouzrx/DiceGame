@@ -4,13 +4,18 @@ using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using DiceGame.ConsoleVersion.Extensions;
 using DiceGame.ConsoleVersion.Utilities;
+using DiceGame.Common.GameLogic.ProbabilityHelpers;
+using Microsoft.Extensions.Logging;
+using DiceGame.Common.Enums;
 
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddSingleton<GameResultsCollector>();
+serviceCollection.AddSingleton<ProbabilityHelper>();
 serviceCollection.RegisterServicesNecessaryForGame(false);
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 var resultCollector = serviceProvider.GetRequiredService<GameResultsCollector>();
+var probabilityHelper = serviceProvider.GetRequiredService<ProbabilityHelper>();
 
 Stopwatch stopwatch = new();
 stopwatch.Start();
@@ -23,9 +28,14 @@ for (int i = 0; i < 100; i++)
         tasks.Add(Task.Run(async () =>
         {
             using var localHost = Host.CreateDefaultBuilder()
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
+                })
                 .ConfigureServices((context, services) =>
                 {
                     services.AddSingleton(resultCollector);
+                    services.AddSingleton(probabilityHelper);
                     services.RegisterServicesNecessaryForGame(false);
                     services.AddHostedService<Game>();
                 })
@@ -39,8 +49,10 @@ for (int i = 0; i < 100; i++)
 
 await Task.WhenAll(tasks);
 
+
+
 stopwatch.Stop();
-Console.WriteLine($"Finished 100 tasks in {stopwatch.Elapsed}");
+Console.WriteLine($"Finished 10000 tasks in {stopwatch.Elapsed}");
 
 var winnerCounts = resultCollector.GetWinners();
 

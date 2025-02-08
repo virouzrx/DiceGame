@@ -6,13 +6,8 @@ namespace DiceGame.Common.Players
     {
         private readonly ProbabilityHelper _probabilityHelper = probabilityHelper;
 
-        public IPlayer CreatePlayer(PlayerType playerType, string name, BotType? botType = null)
+        public IPlayer CreatePlayer(string name, BotType? botType = null)
         {
-            //if (playerType == PlayerType.Human)
-            //{
-            //    return new HumanPlayer(name);
-            //}
-
             if (botType == null)
             {
                 throw new ArgumentException("BotType cannot be null while generating bot player");
@@ -20,10 +15,10 @@ namespace DiceGame.Common.Players
 
             return botType switch
             {
-                BotType.NoRisk => new NoRiskBotPlayer(name),
-                BotType.LittleRisk => new LittleRiskBotPlayer(name),
-                BotType.ModerateRisk => new ModerateRiskBotPlayer(name, _probabilityHelper),
-                BotType.Risky => new RiskyBotPlayer(name, _probabilityHelper),
+                BotType.NoRisk => new NoRiskBotPlayer(),
+                BotType.LittleRisk => new LittleRiskBotPlayer(),
+                BotType.ModerateRisk => new ModerateRiskBotPlayer(_probabilityHelper),
+                BotType.Risky => new RiskyBotPlayer(_probabilityHelper),
                 _ => throw new ArgumentException("Unknown bot type"),
             };
         }

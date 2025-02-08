@@ -1,9 +1,12 @@
-﻿namespace DiceGameConsoleVersion.Logic
+﻿
+namespace DiceGameConsoleVersion.Logic
 {
     public class HumanPlayer(string name) : IPlayer
     {
         public Guid Id { get; init; } = Guid.NewGuid();
         public string? Name { get; init; } = name;
+        public bool IsBot { get; init; } = false;
+        public BotType BotType { get; init; }
 
         public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {

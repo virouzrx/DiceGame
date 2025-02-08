@@ -1,11 +1,23 @@
 ﻿namespace DiceGame.Common.Players.Bots
 {
-    public class RiskyBotPlayer(string name, ProbabilityHelper helper) : IPlayer
+    public class RiskyBotPlayer : IPlayer
     {
+        public RiskyBotPlayer(string name, ProbabilityHelper probabilityHelper)
+        {
+            Name = name;
+            _probabilityHelper = probabilityHelper;
+        }
+        public RiskyBotPlayer(ProbabilityHelper probabilityHelper)
+        {
+            Name = "Risky";
+            _probabilityHelper = probabilityHelper;
+        }
         public Guid Id { get; init; } = Guid.NewGuid();
-        public string Name { get; init; } = name;
+        public string Name { get; init; }
+        public bool IsBot { get; init; } = true;
+        public BotType BotType { get; init; } = BotType.Risky;
 
-        public readonly ProbabilityHelper _probabilityHelper = helper;
+        public readonly ProbabilityHelper _probabilityHelper;
 
         public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {

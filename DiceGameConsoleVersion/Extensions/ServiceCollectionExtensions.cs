@@ -7,7 +7,10 @@ namespace DiceGame.ConsoleVersion.Extensions
     {
         public static void RegisterServicesNecessaryForGame(this IServiceCollection serviceCollection, bool useConsole = true)
         {
-            serviceCollection.AddScoped<ProbabilityHelper>();
+            if (!serviceCollection.Any(sd => sd.ServiceType == typeof(ProbabilityHelper)))
+            {
+                serviceCollection.AddSingleton<ProbabilityHelper>();
+            }
             serviceCollection.AddScoped<PlayerFactory>();
             if (useConsole)
             {
@@ -31,10 +34,10 @@ namespace DiceGame.ConsoleVersion.Extensions
                 var playerFactory = provider.GetRequiredService<PlayerFactory>()!;
                 return
                 [
-                    playerFactory.CreatePlayer(PlayerType.Bot, "NoRisk", BotType.NoRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "LittleRisk", BotType.LittleRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "ModerateRisk", BotType.ModerateRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "Risky", BotType.Risky),
+                    playerFactory.CreatePlayer("NoRisk", BotType.NoRisk),
+                    playerFactory.CreatePlayer("LittleRisk", BotType.LittleRisk),
+                    playerFactory.CreatePlayer("ModerateRisk", BotType.ModerateRisk),
+                    playerFactory.CreatePlayer("Risky", BotType.Risky),
                 ];
             });
 

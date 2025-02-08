@@ -2,10 +2,20 @@
 
 namespace DiceGame.Common.Players.Bots
 {
-    public class LittleRiskBotPlayer(string name) : IPlayer
+    public class LittleRiskBotPlayer : IPlayer
     {
-        public string Name { get; init; } = name;
+        public LittleRiskBotPlayer(string name)
+        {
+            Name = name;
+        }
+        public LittleRiskBotPlayer()
+        {
+            Name = "LittleRisk";
+        }
+        public string Name { get; init; }
         public Guid Id { get; init; } = Guid.NewGuid();
+        public bool IsBot { get; init; } = true;
+        public BotType BotType { get; init; } = BotType.LittleRisk;
 
         public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
