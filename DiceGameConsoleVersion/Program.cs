@@ -1,31 +1,22 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using DiceGame.ConsoleVersion.Extensions;
 
 namespace DiceGameConsoleVersion
 {
     public class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddScoped<ProbabilityHelper>();
-            serviceCollection.AddScoped<PlayerFactory>();
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            var probabilityHelper = serviceProvider.GetService<ProbabilityHelper>();
-            var playerFactory = new PlayerFactory(probabilityHelper!);     
-            for (int i = 0; i < 1000; i++)
-            {
-                var players = new List<IPlayer>
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) =>
                 {
-                    playerFactory.CreatePlayer(PlayerType.Bot, "NoRisk", BotType.NoRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "LittleRisk", BotType.LittleRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "ModerateRisk", BotType.ModerateRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "Risky", BotType.Risky),
-                };
+                    services.RegisterServicesNecessaryForGame();
+                    services.AddHostedService<Game>();
+                })
+                .Build();
 
-                var game = new Game(players, 0);
-                game.StartGame();
-                var x = 0;
-            }
+                await host.RunAsync();
         }
     }
 }

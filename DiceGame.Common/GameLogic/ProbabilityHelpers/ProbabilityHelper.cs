@@ -1,11 +1,13 @@
-﻿namespace DiceGame.Common.GameLogic.ProbabilityHelpers
+﻿using System.Collections.Concurrent;
+
+namespace DiceGame.Common.GameLogic.ProbabilityHelpers
 {
     public class ProbabilityHelper
     {
-        private readonly List<MonteCarloCache> _cache = new();
+        private readonly ConcurrentDictionary<(int DiceCount, int DesiredPoints), double> _cache = new();
         public static List<List<int>> GenerateDiceCombinations(int numOfDice)
         {
-            List<List<int>> combinations = new();
+            List<List<int>> combinations = [];
             List<int> currentCombination = new(new int[numOfDice]);
             GenerateDiceCombinationsHelper(combinations, currentCombination, 0, numOfDice);
             return combinations;
@@ -29,14 +31,17 @@
         //this will be painful to write
         public double CalculateProbabilityOfThrowingParticularScoreOrHigher(int score, int alreadyPointedDice)
         {
-            var probabilityFromCache = _cache.FirstOrDefault(x => x.DesiredPoints == score && x.DiceCount == alreadyPointedDice);
-            if (probabilityFromCache == null)
+            var key = (alreadyPointedDice, score);
+
+            if (_cache.TryGetValue(key, out var probabilityFromCache))
             {
-                var probability = MonteCarloGenerationHelper.SimulateDiceRolls(alreadyPointedDice, score);
-                _cache.Add(new MonteCarloCache(alreadyPointedDice, score, probability));
-                return probability;
+                return probabilityFromCache;
             }
-            return probabilityFromCache.Probability;
+
+            var probability = MonteCarloGenerationHelper.SimulateDiceRolls(alreadyPointedDice, score);
+            _cache[key] = probability;
+
+            return probability;
         }
 
         private static List<List<int>> FindPointableCombinations(List<List<int>> allCombinations)

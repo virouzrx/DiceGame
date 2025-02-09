@@ -1,22 +1,23 @@
-﻿using DiceGame.Common.Enums;
-using DiceGame.Common.GameLogic;
-using DiceGame.Common.GameLogic.ProbabilityHelpers;
-
-namespace DiceGame.Common.Players.Bots
+﻿namespace DiceGame.Common.Players.Bots
 {
     public class RiskyBotPlayer : IPlayer
     {
-        public string? Name { get; init; }
-        public int Score { get; set; }
-        public GamePhase CurrentGamePhase { get; set; }
-        public int MoveNumber { get; set; }
-        public readonly ProbabilityHelper _probabilityHelper;
-
-        public RiskyBotPlayer(string name, ProbabilityHelper helper)
+        public RiskyBotPlayer(string name, ProbabilityHelper probabilityHelper)
         {
             Name = name;
-            _probabilityHelper = helper;
+            _probabilityHelper = probabilityHelper;
         }
+        public RiskyBotPlayer(ProbabilityHelper probabilityHelper)
+        {
+            Name = "Risky";
+            _probabilityHelper = probabilityHelper;
+        }
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public string Name { get; init; }
+        public bool IsBot { get; init; } = true;
+        public BotType BotType { get; init; } = BotType.Risky;
+
+        public readonly ProbabilityHelper _probabilityHelper;
 
         public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
@@ -34,7 +35,7 @@ namespace DiceGame.Common.Players.Bots
                     return diceToPoint;
                 }
 
-                return new[] { new PointableDice(die.Score, 1) };
+                return [new PointableDice(die.Score, 1)];
             }
 
             if (diceToPoint.Count() == 3)
@@ -68,10 +69,10 @@ namespace DiceGame.Common.Players.Bots
             return Get1Or5(diceToPoint);
         }
 
-        public bool EndTurn(int roundScore, GameHistory gameHistory, int alreadyPointedDice)
+        public bool EndTurn(int roundScore, GameStateOverview gameStateOverview, int alreadyPointedDice)
         {
-            var currentLeaderboard = gameHistory.GetLastHistoryItem();
-            if (CurrentGamePhase == GamePhase.NotEntered)
+            var currentLeaderboard = gameStateOverview.Leaderboard.OrderByDescending(x => x.Score).ToList();
+            if (gameStateOverview.PlayerGamePhase == GamePhase.NotEntered)
             {
                 if (!currentLeaderboard.Any(x => x.CurrentGamePhase != GamePhase.NotEntered))
                 {
@@ -88,19 +89,19 @@ namespace DiceGame.Common.Players.Bots
 
                 return !CanPlayerBeOvertakenOnEnteringTheGame(currentLeaderboard, roundScore, alreadyPointedDice);
             }
-            else if (CurrentGamePhase == GamePhase.Entered)
+            else if (gameStateOverview.PlayerGamePhase == GamePhase.Entered)
             {
                 if (alreadyPointedDice == 6 || alreadyPointedDice == 0)
                 {
                     return true;
                 }
 
-                if (Score > 800 && Score < 900)
+                if (gameStateOverview.PlayersScore > 800 && gameStateOverview.PlayersScore < 900)
                 {
-                    return Score + roundScore <= 895 || Score + roundScore > 940;
+                    return gameStateOverview.PlayersScore + roundScore <= 895 || gameStateOverview.PlayersScore + roundScore > 940;
                 }
 
-                if (gameHistory.History.Count >= 3 && !gameHistory.PlayerScoredInLastRounds(Name!, 3))
+                if (gameStateOverview.LastPlayersMoves.Count >= 3 && !gameStateOverview.PlayerScoredInLastRounds(3))
                 {
                     return true;
                 }
@@ -126,15 +127,16 @@ namespace DiceGame.Common.Players.Bots
         private static IEnumerable<PointableDice> Get1Or5(IEnumerable<PointableDice> diceToPoint)
         {
             return diceToPoint.Any(x => x.Score == 1)
-                        ? new[] { new PointableDice(1, 1) }
+                        ? [new PointableDice(1, 1)]
                         : new[] { new PointableDice(5, 1) };
         }
 
-        private bool CanPlayerBeOvertakenOnEnteringTheGame(List<IPlayer> players, int score, int alreadyPointedDice)
+        private static bool CanPlayerBeOvertakenOnEnteringTheGame(List<PlayerInfo> players, int score, int alreadyPointedDice)
         {
             var playersThatEnteredTheGame = players
                 .Where(x => x.CurrentGamePhase != GamePhase.NotEntered)
                 .OrderBy(x => x.Score);
+
             if (playersThatEnteredTheGame.First().Score > score)
             {
                 return playersThatEnteredTheGame.First().Score - score < 30
@@ -143,10 +145,11 @@ namespace DiceGame.Common.Players.Bots
             return false;
         }
 
-        private bool ShouldRisk(List<IPlayer> players, int roundScore, int alreadyPointedDice)
+        private bool ShouldRisk(List<PlayerInfo> players, int roundScore, int alreadyPointedDice)
         {
-            var index = players.IndexOf(this);
-            var playerRoundscore = Score + roundScore;
+            var player = players.First(x => x.Id == Id);
+            var index = players.IndexOf(player);
+            var playerRoundscore = player.Score + roundScore;
             if (index == 0)
             {
                 return playerRoundscore - players[1].Score > 100;

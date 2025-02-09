@@ -1,8 +1,12 @@
-﻿namespace DiceGame.Common.GameLogic.ProbabilityHelpers
+﻿using DiceGame.Common.Extensions;
+using System.Collections.Concurrent;
+
+namespace DiceGame.Common.GameLogic.ProbabilityHelpers
 {
     public class MonteCarloGenerationHelper
     {
         private static readonly Random _random = new();
+        private static readonly ConcurrentDictionary<string, (int successes, int failures)> memoizationCache = new();
 
         public static double SimulateDiceRolls(int diceAmount, int desiredScore)
         {
@@ -32,6 +36,13 @@
 
         private static (int successes, int failures) SimulateDiceRollsRecursive(List<PointableDice> keptDice, int remainingDice, int currentScore, int desiredScore)
         {
+            var cacheKey = $"{string.Join(",", keptDice.Select(d => d.DiceCount))}-{remainingDice}-{currentScore}";
+
+            if (memoizationCache.ContainsKey(cacheKey))
+            {
+                return memoizationCache[cacheKey];
+            }
+
             if (currentScore >= desiredScore)
             {
                 return (1, 0);
@@ -60,13 +71,14 @@
                 totalFailures += failures;
             }
 
-
-            if (!choices.Any())
+            if (choices.Count == 0)
             {
                 totalFailures++;
             }
 
-            return (totalSuccesses, totalFailures);
+            var result = (totalSuccesses, totalFailures);
+            memoizationCache[cacheKey] = result;
+            return result;
         }
 
         private static List<List<PointableDice>> GetAllCombinationsOfChoices(List<PointableDice> choices)

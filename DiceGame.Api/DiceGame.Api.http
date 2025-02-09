@@ -1,0 +1,6 @@
+@DiceGame.Api_HostAddress = http://localhost:5086
+
+GET {{DiceGame.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

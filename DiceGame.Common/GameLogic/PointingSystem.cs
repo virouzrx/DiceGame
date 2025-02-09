@@ -1,6 +1,4 @@
-﻿using DiceGame.Common;
-using DiceGame.Common.Enums;
-using DiceGame.Common.Players;
+﻿using DiceGame.Common.Extensions;
 
 namespace DiceGame.Common.GameLogic
 {
@@ -36,35 +34,37 @@ namespace DiceGame.Common.GameLogic
             return pointableDice.Count > 0 ? pointableDice : new List<PointableDice>();
         }
 
-        public static List<IPlayer> UpdateScoreboard(List<IPlayer> playerList, IPlayer player, int score)
+        public static void UpdateScoreboard(GameState gameState, IPlayer player, int score)
         {
-            var initialList = playerList.ToList().OrderByScore();
-            var playerListOld = playerList.ToList().OrderByScore();
+            var initialList = gameState.Leaderboard.OrderByScore();
+            var playerListOld = initialList.ToList();
+            var playerToUpdate = gameState.Leaderboard.First(x => x.Id == player.Id);
+            var playerList = gameState.Leaderboard;
 
-            player.Score += score;
+            playerToUpdate.Score += score;
             playerList = playerList.OrderByScore();
 
-            if (player.Score >= 1000)
+            if (playerToUpdate.Score >= 1000)
             {
-                player.CurrentGamePhase = GamePhase.Finished;
+                playerToUpdate.CurrentGamePhase = GamePhase.Finished;
             }
 
-            if (player.CurrentGamePhase == GamePhase.NotEntered)
+            if (playerToUpdate.CurrentGamePhase == GamePhase.NotEntered)
             {
-                player.CurrentGamePhase = GamePhase.Entered;
+                playerToUpdate.CurrentGamePhase = GamePhase.Entered;
             }
 
-            if (player.CurrentGamePhase == GamePhase.Entered && player.Score > 900)
+            if (playerToUpdate.CurrentGamePhase == GamePhase.Entered && playerToUpdate.Score > 900)
             {
-                player.CurrentGamePhase = GamePhase.Finishing;
+                playerToUpdate.CurrentGamePhase = GamePhase.Finishing;
             }
 
-            if (player.CurrentGamePhase == GamePhase.Finishing && player.Score < 900)
+            if (playerToUpdate.CurrentGamePhase == GamePhase.Finishing && playerToUpdate.Score < 900)
             {
-                player.CurrentGamePhase = GamePhase.Entered;
+                playerToUpdate.CurrentGamePhase = GamePhase.Entered;
             }
 
-            var playerIndex = playerList.IndexOf(player);
+            var playerIndex = playerList.IndexOf(playerList.First(x => x.Id == player.Id));
             var playerScoreDecreased = true;
             while (playerScoreDecreased)
             {
@@ -86,7 +86,7 @@ namespace DiceGame.Common.GameLogic
                             continue;
                         }
 
-                        var playerWithHigherIndex = playerList.GetPlayerWithHigherIndex(playerMarkedForPointDecrease);
+                        var playerWithHigherIndex = playerList.GetPlayerWithHigherIndex(playerMarkedForPointDecrease.Id);
                         if (playerWithHigherIndex == null)
                         {
                             continue;
@@ -111,12 +111,12 @@ namespace DiceGame.Common.GameLogic
                 }
             }
 
-            var playersWithTheSameScore = playerList.Where(p => p.Score == player.Score);
+            var playersWithTheSameScore = playerList.Where(p => p.Score == playerToUpdate.Score);
             if (playersWithTheSameScore.Count() > 1)
             {
                 var playerThatShouldBeHigher = playersWithTheSameScore.First(p => p.Name != player.Name);
                 var playerThatShouldBeHigherIndex = playerList.IndexOf(playerThatShouldBeHigher);
-                var playerIndexAfterUpdate = playerList.IndexOf(player);
+                var playerIndexAfterUpdate = playerList.IndexOf(playerList.First(x => x.Id == player.Id));
 
                 if (playerIndexAfterUpdate < playerThatShouldBeHigherIndex)
                 {
@@ -124,7 +124,6 @@ namespace DiceGame.Common.GameLogic
                         (playerList[playerThatShouldBeHigherIndex], playerList[playerIndexAfterUpdate]);
                 }
             }
-            return playerList.OrderByScore();
         }
     }
 }

@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiceGame.UnitTests", "DiceG
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiceGame.Common", "DiceGame.Common\DiceGame.Common.csproj", "{3F3EEA4C-D46F-459A-9895-A57112023BD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DIceGame.Simulations", "DIceGame.Simulations\DIceGame.Simulations.csproj", "{0E8EED7D-F863-47CB-9905-C976C5A25224}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DIceGame.Simulations", "DIceGame.Simulations\DIceGame.Simulations.csproj", "{0E8EED7D-F863-47CB-9905-C976C5A25224}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceGame.Api", "DiceGame.Api\DiceGame.Api.csproj", "{71BF661D-0E94-4136-B9FE-851EFDF66D59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{0E8EED7D-F863-47CB-9905-C976C5A25224}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E8EED7D-F863-47CB-9905-C976C5A25224}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E8EED7D-F863-47CB-9905-C976C5A25224}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71BF661D-0E94-4136-B9FE-851EFDF66D59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71BF661D-0E94-4136-B9FE-851EFDF66D59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71BF661D-0E94-4136-B9FE-851EFDF66D59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71BF661D-0E94-4136-B9FE-851EFDF66D59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,91 +1,93 @@
-﻿namespace DiceGame.Common.GameLogic
+﻿using DiceGame.Common.Extensions;
+using DiceGame.ConsoleVersion.Utilities;
+using Microsoft.Extensions.Hosting;
+
+namespace DiceGame.Common.GameLogic
 {
-    public class Game
+    public class Game(
+        IEnumerable<IPlayer> players, 
+        GameState gameState, 
+        GameResultsCollector resultCollector, 
+        ConsoleSettings consoleSettings) : IHostedService
     {
-        public GameHistory GameHistory { get; set; }
-        public List<IPlayer> Players { get; set; }
-        private readonly Random _random;
-        public int TaskId { get; set; }
-        public Game(List<IPlayer> players, int taskId)
-        {
-            Players = players;
-            GameHistory = new GameHistory();
-            _random = new Random();
-            TaskId = taskId;
-        }
+        public GameState GameState { get; set; } = gameState;
+        private readonly GameResultsCollector _resultCollector = resultCollector;
+        private readonly ConsoleSettings _consoleSettings = consoleSettings;
+        public IEnumerable<IPlayer> Players { get; set; } = players;
+        private readonly Random _random = new();
 
         public void StartGame()
         {
-            while (!Players.Any(x => x.CurrentGamePhase == GamePhase.Finished))
+            while (!GameState.Leaderboard.Any(x => x.CurrentGamePhase == GamePhase.Finished))
             {
-                GameHistory.History.Add(Players);
                 foreach (var player in Players)
                 {
-                    //ConsoleManagement.DisplayLeaderboard(Players);
-                    var score = PlayersTurn(player);
+                    var playerState = GameState.Leaderboard.First(x => x.Id == player.Id);
+                    ConsoleManagement.DisplayLeaderboard(_consoleSettings.UseConsole, GameState.Leaderboard);
+                    var score = PlayersTurn(player, playerState);
                     if (score != 0)
                     {
-                        PointingSystem.UpdateScoreboard(Players, player, score);
+                        PointingSystem.UpdateScoreboard(GameState, player, score);
                     }
 
-                    if (player.CurrentGamePhase == GamePhase.Finished)
+                    if (playerState.CurrentGamePhase == GamePhase.Finished)
                     {
-                        //Console.WriteLine($"{player.Name} wins! Congratulations!");
+                        _resultCollector.AddWinner(player.BotType);
                         return;
                     }
-                    GameHistory.UpdatePlayer(player);
+                    playerState.MoveNumber++;
+                    GameState.History.Add((player.Id, playerState.Score));
                 }
             }
         }
 
-        public int PlayersTurn(IPlayer player)
+        public int PlayersTurn(IPlayer player, PlayerInfo playerInfo)
         {
             bool playerEndendTheirTurn = false;
             int alreadyPointedDice = 0;
             int playerScore = 0;
             int moveNumber = 0;
-            player.MoveNumber++;
 
             while (!playerEndendTheirTurn)
             {
                 moveNumber++;
                 var playerThrow = _random.Throw(6 - alreadyPointedDice);
                 var diceToPoint = PointingSystem.FindDiceToPoint(playerThrow);
-                //Console.WriteLine($"Player: {player.Name}, Phase: {player.CurrentGamePhase}, {moveNumber} throw: {string.Join(", ", playerThrow)}");
-                //Console.WriteLine("------------------------");
+                ConsoleManagement.DisplayCurrentPlayerInfo(_consoleSettings.UseConsole, player.Name, playerInfo.CurrentGamePhase, moveNumber, playerThrow);
                 if (!diceToPoint.Any())
                 {
                     if (alreadyPointedDice != 0)
                     {
-                        //Console.WriteLine("No dice to point was thrown.\n");
+                        ConsoleManagement.DisplayNoDiceToPointMessage(_consoleSettings.UseConsole);
                         return 0;
                     }
-                    if (player.CurrentGamePhase != GamePhase.NotEntered)
+                    if (playerInfo.CurrentGamePhase != GamePhase.NotEntered)
                     {
-                        //Console.WriteLine("No dice to point was thrown by player. -50 points.");
+                        ConsoleManagement.DisplayNoDiceToPointWithMinusPointsMessage(_consoleSettings.UseConsole);
                         return -50;
                     }
-                    //Console.WriteLine("No dice to point was thrown by player.");
+                    ConsoleManagement.DisplayNoDiceToPointAtAllMessage(_consoleSettings.UseConsole);
                     return 0;
                 }
 
-                //ConsoleManagement.DisplayTheDiceThrown(diceToPoint);
+                ConsoleManagement.DisplayTheDiceThrown(_consoleSettings.UseConsole, diceToPoint);
 
                 var diceChose = player.ChooseDice(diceToPoint, alreadyPointedDice);
                 alreadyPointedDice += diceChose.Sum(x => x.DiceCount);
                 var tempscore = PointingSystem.CalculatePointsFromDice(diceChose);
                 playerScore += tempscore;
-                if ((playerScore >= 100 && player.CurrentGamePhase == GamePhase.Finishing) || playerScore + player.Score >= 1000)
+                if ((playerScore >= 100 && playerInfo.CurrentGamePhase == GamePhase.Finishing) || playerScore + playerInfo.Score >= 1000)
                 {
                     return playerScore;
                 }
-                if (CheckIfPlayerCanFinishTheTurn(player.CurrentGamePhase, playerScore))
+                if (CheckIfPlayerCanFinishTheTurn(playerInfo.CurrentGamePhase, playerScore))
                 {
-                    playerEndendTheirTurn = player.EndTurn(playerScore, GameHistory, alreadyPointedDice);
+                    var gameStateOverview = new GameStateOverview(GameState, player.Id);
+                    playerEndendTheirTurn = player.EndTurn(playerScore, gameStateOverview, alreadyPointedDice);
                 }
                 else
                 {
-                    //Console.WriteLine($"{player.Name}'s score is {playerScore}");
+                    ConsoleManagement.DisplayPlayerScore(_consoleSettings.UseConsole, player.Name, playerScore);
                 }
 
             }
@@ -100,6 +102,17 @@
                 GamePhase.Entered => score >= 30,
                 _ => throw new ArgumentException("Player with wrong gamephase was present in the game"),
             };
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            StartGame();
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

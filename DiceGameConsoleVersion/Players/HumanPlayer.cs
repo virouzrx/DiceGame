@@ -1,34 +1,12 @@
-﻿using DiceGame.Common.Enums;
-using DiceGame.Common.GameLogic;
-using DiceGame.Common.Players;
-
+﻿
 namespace DiceGameConsoleVersion.Logic
 {
-    public class HumanPlayer : IPlayer
+    public class HumanPlayer(string name) : IPlayer
     {
-        public string? Name { get; init; }
-        public int Score { get; set; }
-        public GamePhase CurrentGamePhase { get; set; }
-        public int MoveNumber { get; set; }
-
-        public HumanPlayer(string name)
-        {
-            Name = name;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-                return false;
-
-            IPlayer other = (IPlayer)obj;
-            return Name == other.Name;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, Score, CurrentGamePhase);
-        }
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public string? Name { get; init; } = name;
+        public bool IsBot { get; init; } = false;
+        public BotType BotType { get; init; }
 
         public IEnumerable<PointableDice> ChooseDice(IEnumerable<PointableDice> diceToPoint, int alreadyPointedDice)
         {
@@ -63,7 +41,7 @@ namespace DiceGameConsoleVersion.Logic
             return selectedDice;
         }
 
-        public bool EndTurn(int roundScore, GameHistory history, int alreadyPointedDice)
+        public bool EndTurn(int roundScore, GameStateOverview gameStateOverview, int alreadyPointedDice)
         {
             Console.WriteLine("Your score is {0}. Do you wish to continue?", roundScore);
             var response = Console.ReadLine();

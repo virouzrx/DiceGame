@@ -1,3 +1,6 @@
+using DiceGame.Common.Players.Bots;
+using DiceGame.UnitTests.Helpers;
+
 namespace DiceGameUnitTests
 {
     public class PointingSystemTests
@@ -52,191 +55,123 @@ namespace DiceGameUnitTests
         [Fact]
         public void UpdateScoreboardTest_PlayerEntersTheGame_AfterThrowing100()
         {
-            var players = new List<IPlayer>
-            {
-                new HumanPlayer("Player1"),
-                new HumanPlayer ("Player2"),
-                new HumanPlayer ("Player3"),
-                new HumanPlayer ("Player4")
-            };
+            var testPlayer = new NoRiskBotPlayer("Bot");
+            var gameState = new GameStateBuilder()
+                .WithPlayer("Player1", GamePhase.NotEntered, 0)
+                .WithPlayerToTest(testPlayer, GamePhase.NotEntered, 0)
+                .BuildGameState();
 
-            var player1 = players.First();
-            PointingSystem.UpdateScoreboard(players, player1, 100);
-
-            Assert.True(player1.Score == 100);
-            Assert.True(player1.CurrentGamePhase == GamePhase.Entered);
+            PointingSystem.UpdateScoreboard(gameState, testPlayer, 100);
+            Assert.True(gameState.Leaderboard.First(x => x.Id == testPlayer.Id).CurrentGamePhase == GamePhase.Entered);
         }
 
         [Fact]
         public void UpdateScoreboardTest_Player2OvertakesPlayer1()
         {
-            var player1 = new HumanPlayer ("Player1");
-            var player2 = new HumanPlayer ("Player2");
-            var player3 = new HumanPlayer ("Player3");
-            var player4 = new HumanPlayer ("Player4");
+            var testPlayer = new NoRiskBotPlayer("Bot");
+            var gameState = new GameStateBuilder()
+                .WithPlayer("Player1", GamePhase.Entered, 300)
+                .WithPlayerToTest(testPlayer, GamePhase.Entered, 295)
+                .BuildGameState();
 
-            player1.Score = 300;
-            player1.CurrentGamePhase = GamePhase.Entered;
+            PointingSystem.UpdateScoreboard(gameState, testPlayer, 55);
 
-            player2.Score = 295;
-            player2.CurrentGamePhase = GamePhase.Entered;
+            var player1 = gameState.Leaderboard.First(x => x.Name == "Player1");
 
-            var players = new List<IPlayer>
-            {
-                player1, player2, player3, player4
-            };
-
-            PointingSystem.UpdateScoreboard(players, player2, 55);
-
-            Assert.True(player2.Score == 350);
             Assert.True(player1.Score == 200);
+            Assert.True(gameState.Leaderboard.First(x => x.Id == testPlayer.Id).Score == 350);
+            Assert.True(gameState.PlayerIndex(testPlayer.Id) == 0);
         }
 
         [Fact]
         public void UpdateScoreboardTest_Player2DoesntOvertakePlayer1_WhenTheirScoreIsEqual()
         {
-            var player1 = new HumanPlayer ("Player1");
-            var player2 = new HumanPlayer ("Player2");
-            var player3 = new HumanPlayer ("Player3");
-            var player4 = new HumanPlayer ("Player4");
+            var testPlayer = new NoRiskBotPlayer("Bot");
+            var gameState = new GameStateBuilder()
+                .WithPlayer("Player1", GamePhase.Entered, 300)
+                .WithPlayerToTest(testPlayer, GamePhase.Entered, 200)
+                .BuildGameState();
 
-            player1.Score = 300;
-            player1.CurrentGamePhase = GamePhase.Entered;
+            PointingSystem.UpdateScoreboard(gameState, testPlayer, 100);
 
-            player2.Score = 200;
-            player2.CurrentGamePhase = GamePhase.Entered;
+            var player1 = gameState.Leaderboard.First(x => x.Name == "Player1");
 
-            var players = new List<IPlayer>
-            {
-                player1, player2, player3, player4
-            };
-
-            PointingSystem.UpdateScoreboard(players, player2, 100);
-
-            Assert.True(player2.Score == 300);
             Assert.True(player1.Score == 300);
-            Assert.True(players.IndexOf(player1) == 0);
+            Assert.True(gameState.Leaderboard.First(x => x.Id == testPlayer.Id).Score == 300);
+            Assert.True(gameState.PlayerIndex(player1.Id) == 0);
         }
 
         [Fact]
         public void UpdateScoreboardTest_Player2DoesntOvertakePlayer1_WhenEnteringTheGame()
         {
-            var player1 = new HumanPlayer("Player1");
-            var player2 = new HumanPlayer("Player2");
-            var player3 = new HumanPlayer("Player3");
-            var player4 = new HumanPlayer("Player4");
+            var testPlayer = new NoRiskBotPlayer("Bot");
+            var gameState = new GameStateBuilder()
+                .WithPlayer("Player1", GamePhase.Entered, 400)
+                .WithPlayer("Player2", GamePhase.Entered, 105)
+                .WithPlayer("Player3", GamePhase.Entered, 80)
+                .WithPlayerToTest(testPlayer, GamePhase.NotEntered, 0)
+                .BuildGameState();
 
-            player1.Score = 420;
-            player1.CurrentGamePhase = GamePhase.Entered;
+            PointingSystem.UpdateScoreboard(gameState, testPlayer, 105);
 
-            player2.Score = 105;
-            player2.CurrentGamePhase = GamePhase.Entered;
-
-            player3.Score = 80;
-            player3.CurrentGamePhase = GamePhase.Entered;
-
-            var players = new List<IPlayer>
-            {
-                player1, player2, player3, player4
-            };
-
-            PointingSystem.UpdateScoreboard(players, player4, 105);
-
-            Assert.True(player4.Score == 105);
+            var player2 = gameState.Leaderboard.First(x => x.Name == "Player2");
+            Assert.True(gameState.Leaderboard.First(x => x.Id == testPlayer.Id).Score == 105);
             Assert.True(player2.Score == 105);
-            Assert.True(players.IndexOf(player1) < players.IndexOf(player2));
+            Assert.True(gameState.PlayerIndex(player2.Id) < gameState.PlayerIndex(testPlayer.Id));
         }
 
         [Fact]
         public void UpdateScoreboardTest_PlayerThrewNothingPointable_GetsOvertakenByRestOfThePlayers()
         {
-            var player1 = new HumanPlayer ("Player1");
-            var player2 = new HumanPlayer ("Player2");
-            var player3 = new HumanPlayer ("Player3");
-            var player4 = new HumanPlayer ("Player4");
+            var testPlayer = new NoRiskBotPlayer("Bot");
+            var gameState = new GameStateBuilder()
+                .WithPlayer("Player1", GamePhase.Entered, 400)
+                .WithPlayer("Player2", GamePhase.Entered, 390)
+                .WithPlayer("Player4", GamePhase.Entered, 375)
+                .WithPlayerToTest(testPlayer, GamePhase.Entered, 420)
+                .BuildGameState();
 
-            player1.Score = 420;
-            player1.CurrentGamePhase = GamePhase.Entered;
+            PointingSystem.UpdateScoreboard(gameState, testPlayer, -50);
 
-            player2.Score = 400;
-            player2.CurrentGamePhase = GamePhase.Entered;
-
-            player3.Score = 390;
-            player3.CurrentGamePhase = GamePhase.Entered;
-
-            player4.Score = 375;
-            player4.CurrentGamePhase = GamePhase.Entered;
-
-            var players = new List<IPlayer>
-            {
-                player1, player2, player3, player4
-            };
-
-            players = PointingSystem.UpdateScoreboard(players, player1, -50);
-
-            Assert.Equal(70, player1.Score);
-            Assert.Equal(3, players.IndexOf(player1));
+            Assert.Equal(70, gameState.Leaderboard.First(x => x.Id == testPlayer.Id).Score);
+            Assert.Equal(3, gameState.PlayerIndex(testPlayer.Id));
         }
 
         [Fact]
         public void UpdateScoreboardTest_Player3Overtakes2Players()
         {
-            var player1 = new HumanPlayer("Player1");
-            var player2 = new HumanPlayer("Player2");
-            var player3 = new HumanPlayer("Player3");
-            var player4 = new HumanPlayer("Player4");
+            var testPlayer = new NoRiskBotPlayer("Bot");
+            var gameState = new GameStateBuilder()
+                .WithPlayer("Player1", GamePhase.Entered, 420)
+                .WithPlayer("Player2", GamePhase.Entered, 400)
+                .WithPlayer("Player4", GamePhase.NotEntered, 0)
+                .WithPlayerToTest(testPlayer, GamePhase.Entered, 310)
+                .BuildGameState();
 
-            player1.Score = 420;
-            player1.CurrentGamePhase = GamePhase.Entered;
 
-            player2.Score = 400;
-            player2.CurrentGamePhase = GamePhase.Entered;
+            PointingSystem.UpdateScoreboard(gameState, testPlayer, 115);
 
-            player3.Score = 310;
-            player3.CurrentGamePhase = GamePhase.Entered;
-
-            player4.Score = 0;
-            player4.CurrentGamePhase = GamePhase.Entered;
-
-            var players = new List<IPlayer>
-            {
-                player1, player2, player3, player4
-            };
-
-            players = PointingSystem.UpdateScoreboard(players, player3, 115);
-
-            Assert.Equal(1, players.IndexOf(player1));
-            Assert.Equal(2, players.IndexOf(player2));
+            var player1 = gameState.Leaderboard.First(x => x.Name == "Player1");
+            var player2 = gameState.Leaderboard.First(x => x.Name == "Player2");
+            Assert.Equal(1, gameState.PlayerIndex(player1.Id));
+            Assert.Equal(2, gameState.PlayerIndex(player2.Id));
         }
 
         [Fact]
         public void UpdateScoreboardTest_PlayerLosesPoints_ShouldChangeGamePhaseFromFinishingToEntered()
         {
-            var player1 = new HumanPlayer("Player1");
-            var player2 = new HumanPlayer("Player2");
-            var player3 = new HumanPlayer("Player3");
-            var player4 = new HumanPlayer("Player4");
+            var testPlayer = new NoRiskBotPlayer("Bot");
+            var gameState = new GameStateBuilder()
+                .WithPlayer("Player1", GamePhase.Entered, 500)
+                .WithPlayer("Player2", GamePhase.Entered, 400)
+                .WithPlayer("Player3", GamePhase.Entered, 310)
+                .WithPlayerToTest(testPlayer, GamePhase.Finishing, 910)
+                .BuildGameState();
 
-            player1.Score = 900;
-            player1.CurrentGamePhase = GamePhase.Finishing;
 
-            player2.Score = 400;
-            player2.CurrentGamePhase = GamePhase.Entered;
+            PointingSystem.UpdateScoreboard(gameState, testPlayer, -50);
 
-            player3.Score = 310;
-            player3.CurrentGamePhase = GamePhase.Entered;
-
-            player4.Score = 0;
-            player4.CurrentGamePhase = GamePhase.Entered;
-
-            var players = new List<IPlayer>
-            {
-                player1, player2, player3, player4
-            };
-
-           PointingSystem.UpdateScoreboard(players, player1, -50);
-
-            Assert.Equal(GamePhase.Entered, player1.CurrentGamePhase);
+            Assert.Equal(GamePhase.Entered, gameState.Leaderboard.First(x => x.Id == testPlayer.Id).CurrentGamePhase);
         }
     }
 }

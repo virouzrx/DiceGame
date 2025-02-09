@@ -1,56 +1,63 @@
-﻿using DiceGame.Common.Enums;
-using DiceGame.Common.GameLogic;
-using DiceGame.Common.GameLogic.ProbabilityHelpers;
-using DiceGame.Common.Players;
+﻿using DiceGame.Common.GameLogic;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Concurrent;
 using System.Diagnostics;
+using Microsoft.Extensions.Hosting;
+using DiceGame.ConsoleVersion.Extensions;
+using DiceGame.ConsoleVersion.Utilities;
+using DiceGame.Common.GameLogic.ProbabilityHelpers;
+using Microsoft.Extensions.Logging;
+using DiceGame.Common.Enums;
 
 var serviceCollection = new ServiceCollection();
-serviceCollection.AddScoped<ProbabilityHelper>();
-serviceCollection.AddScoped<PlayerFactory>();
+serviceCollection.AddSingleton<GameResultsCollector>();
+serviceCollection.AddSingleton<ProbabilityHelper>();
+serviceCollection.RegisterServicesNecessaryForGame(false);
+
 var serviceProvider = serviceCollection.BuildServiceProvider();
-var probabilityHelper = serviceProvider.GetService<ProbabilityHelper>();
-var playerFactory = new PlayerFactory(probabilityHelper!);
-var table = new ConcurrentDictionary<string, int>
-{
-    ["Risky"] = 0,
-    ["NoRisk"] = 0,
-    ["ModerateRisk"] = 0,
-    ["LittleRisk"] = 0,
-};
+var resultCollector = serviceProvider.GetRequiredService<GameResultsCollector>();
+var probabilityHelper = serviceProvider.GetRequiredService<ProbabilityHelper>();
+
+Stopwatch stopwatch = new();
+stopwatch.Start();
+
+var tasks = new List<Task>();
 for (int i = 0; i < 100; i++)
 {
-    var tasks = new List<Task>();
     for (int j = 0; j < 100; j++)
     {
-        tasks.Add(Task.Run(() =>
+        tasks.Add(Task.Run(async () =>
         {
-            var players = new List<IPlayer>
+            using var localHost = Host.CreateDefaultBuilder()
+                .ConfigureLogging(logging =>
                 {
-                    playerFactory.CreatePlayer(PlayerType.Bot, "NoRisk", BotType.NoRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "LittleRisk", BotType.LittleRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "ModerateRisk", BotType.ModerateRisk),
-                    playerFactory.CreatePlayer(PlayerType.Bot, "Risky", BotType.Risky),
-                };
-            var game = new Game(players, j);
-            game.StartGame();
+                    logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddSingleton(resultCollector);
+                    services.AddSingleton(probabilityHelper);
+                    services.RegisterServicesNecessaryForGame(false);
+                    services.AddHostedService<Game>();
+                })
+                .Build();
 
-            var finishedPlayer = players.FirstOrDefault(x => x.CurrentGamePhase == GamePhase.Finished);
-            if (finishedPlayer != null)
-            {
-                table.AddOrUpdate(finishedPlayer.Name!, 1, (key, oldValue) => oldValue + 1);
-            }
+            await localHost.StartAsync();
+            await localHost.StopAsync();
         }));
     }
-    Stopwatch stopwatch = new Stopwatch();
-    stopwatch.Start();
-    await Task.WhenAll(tasks);
-    stopwatch.Stop();
-    Console.WriteLine($"Finished 100 tasks in {stopwatch.Elapsed}");
 }
 
-foreach (var item in table)
+await Task.WhenAll(tasks);
+
+
+
+stopwatch.Stop();
+Console.WriteLine($"Finished 10000 tasks in {stopwatch.Elapsed}");
+
+var winnerCounts = resultCollector.GetWinners();
+
+Console.WriteLine("Player Win Counts:");
+foreach (var winner in winnerCounts)
 {
-    Console.WriteLine($"{item.Key}: {item.Value}");
+    Console.WriteLine($"{winner.Key}: {winner.Value}");
 }
